@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard — TJ Designs</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTkgMjU5Ij48cGF0aCBkPSJNMTExLDY2IEwxMTEsODMgTDExNCw4NiBMMTE1LDg2IEwxMjMsNzggWiBNMjMwLDgwIEwxNDQsMTY2IEwxMzEsMTU1IEwxNTMsMTM0IEwxMjksMTU0IEwxMjQsMTUwIEwxMzAsMTM1IEwxMTMsMTE4IEwxMjMsMTE3IEw5MCwxMDEgTDEwMiwxMDAgTDg1LDgzIEw5Nyw3MSBMMTA1LDc4IEwxMDUsNjEgTDk3LDUzIEw2Nyw4MyBMODQsOTkgTDcyLDEwMCBMNzcsMTA2IEw4OCwxMDYgTDEwNCwxMTYgTDk2LDExOCBMMTEzLDEzOSBMMTA1LDEzNCBMMTEzLDE0OSBMMTI1LDE1NCBMMTEzLDE1NSBMMTEzLDE2NiBMMjcsODAgTDExMiwxNjggWiIgZmlsbD0iYmxhY2siIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #0a0a0c; font-family: 'Inter', sans-serif; color: #f2f1ec; min-height: 100vh; }
+  .grain {
+    position: fixed; inset: -20%; pointer-events: none; opacity: .05; mix-blend-mode: overlay; z-index: 0;
+  }
+  .wrap { position: relative; z-index: 1; max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+  .top-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 2.5rem; flex-wrap: wrap; gap: 1rem;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: 'Bebas Neue', sans-serif; font-size: 1.3rem; letter-spacing: 0.02em;
+  }
+  .brand svg { width: 20px; height: 20px; color: #e2622a; }
+  .signout {
+    font-size: 0.8rem; color: #999790; background: none; border: 1px solid #333;
+    border-radius: 999px; padding: 0.5rem 1rem; cursor: pointer; font-family: 'Inter', sans-serif;
+    transition: border-color 0.25s ease, color 0.25s ease;
+  }
+  .signout:hover { border-color: #e2622a; color: #f2f1ec; }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    letter-spacing: 0.01em; margin: 0 0 0.3rem;
+  }
+  .sub { color: #999790; font-size: 0.9rem; margin: 0 0 2.2rem; }
+
+  .stat-row { display: flex; gap: 1rem; margin-bottom: 2.5rem; flex-wrap: wrap; }
+  .stat-card {
+    flex: 1; min-width: 130px;
+    background: rgba(13, 13, 12, 0.6); border: 1px solid #262520; border-radius: 12px;
+    padding: 1.2rem 1.4rem;
+  }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 2rem; color: #e2622a; }
+  .stat-label { font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; color: #999790; margin-top: 0.2rem; }
+
+  .msg-list { display: flex; flex-direction: column; gap: 0.9rem; }
+  .msg-card {
+    background: rgba(13, 13, 12, 0.6); border: 1px solid #262520; border-radius: 12px;
+    padding: 1.3rem 1.5rem; position: relative;
+  }
+  .msg-card.unread { border-color: #4a2f22; }
+  .msg-card.unread::before {
+    content: ""; position: absolute; left: -1px; top: 14px; bottom: 14px; width: 3px;
+    border-radius: 3px; background: #e2622a;
+  }
+  .msg-top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: 0.5rem; }
+  .msg-name { font-weight: 600; font-size: 0.98rem; }
+  .msg-email { color: #e2622a; font-size: 0.85rem; text-decoration: none; }
+  .msg-meta { font-size: 0.75rem; color: #666; white-space: nowrap; }
+  .msg-type { display: inline-block; font-size: 0.7rem; letter-spacing: 0.04em; text-transform: uppercase; color: #999790; margin-bottom: 0.5rem; }
+  .msg-details { font-size: 0.88rem; line-height: 1.5; color: #d9d7cf; white-space: pre-wrap; }
+  .mark-read-btn {
+    margin-top: 0.8rem; font-size: 0.75rem; color: #666; background: none; border: none; cursor: pointer;
+    font-family: 'Inter', sans-serif; text-decoration: underline;
+  }
+  .mark-read-btn:hover { color: #e2622a; }
+
+  .empty-state, .loading-state { text-align: center; color: #666; padding: 3rem 0; font-size: 0.9rem; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 1.5rem 1rem 4rem; }
+    .msg-top { flex-direction: column; align-items: flex-start; }
+  }
+</style>
+</head>
+<body>
+
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"></feTurbulence></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"></rect>
+</svg>
+
+<div class="wrap">
+  <div class="top-bar">
+    <div class="brand">
+      <svg viewBox="0 0 259 259" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M111,66 L111,83 L114,86 L115,86 L123,78 Z M230,80 L144,166 L131,155 L153,134 L129,154 L124,150 L130,135 L113,118 L123,117 L90,101 L102,100 L85,83 L97,71 L105,78 L105,61 L97,53 L67,83 L84,99 L72,100 L77,106 L88,106 L104,116 L96,118 L113,139 L105,134 L113,149 L125,154 L113,155 L113,166 L27,80 L112,168 Z" fill="currentColor" fill-rule="evenodd"/>
+      </svg>TJ Designs — Panel
+    </div>
+    <button class="signout" id="signoutBtn">Sign out</button>
+  </div>
+
+  <h1>Project inquiries</h1>
+  <p class="sub">Everything submitted through the contact form, newest first.</p>
+
+  <div class="stat-row">
+    <div class="stat-card">
+      <div class="stat-num" id="statTotal">—</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num" id="statUnread">—</div>
+      <div class="stat-label">Unread</div>
+    </div>
+  </div>
+
+  <div id="listRoot" class="msg-list">
+    <div class="loading-state">Loading...</div>
+  </div>
+</div>
+
+<script>
+const sb = supabase.createClient(
+  'https://ijzdtnkdnzlkyfqdcoan.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM'
+);
+
+const username = sessionStorage.getItem('tj_admin_user');
+const password = sessionStorage.getItem('tj_admin_pass');
+
+if (!username || !password) {
+  window.location.href = '/login.html';
+}
+
+const listRoot = document.getElementById('listRoot');
+const statTotal = document.getElementById('statTotal');
+const statUnread = document.getElementById('statUnread');
+
+function escapeHtml(str) {
+  return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+}
+
+function formatDate(iso) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' +
+    d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+}
+
+async function loadMessages() {
+  const { data, error } = await sb.rpc('admin_get_contact_submissions', {
+    p_username: username,
+    p_password: password
+  });
+
+  if (error) {
+    sessionStorage.removeItem('tj_admin_user');
+    sessionStorage.removeItem('tj_admin_pass');
+    window.location.href = '/login.html';
+    return;
+  }
+
+  statTotal.textContent = data.length;
+  statUnread.textContent = data.filter(m => !m.read_at).length;
+
+  if (data.length === 0) {
+    listRoot.innerHTML = '<div class="empty-state">No inquiries yet.</div>';
+    return;
+  }
+
+  listRoot.innerHTML = data.map(m => `
+    <div class="msg-card ${m.read_at ? '' : 'unread'}" data-id="${m.id}">
+      <div class="msg-top">
+        <span class="msg-name">${escapeHtml(m.name)}</span>
+        <span class="msg-meta">${formatDate(m.created_at)}</span>
+      </div>
+      <a class="msg-email" href="mailto:${escapeHtml(m.email)}">${escapeHtml(m.email)}</a>
+      ${m.project_type ? `<div class="msg-type">${escapeHtml(m.project_type)}</div>` : ''}
+      <div class="msg-details">${escapeHtml(m.details || '(no details provided)')}</div>
+      ${m.read_at ? '' : '<button class="mark-read-btn" data-id="' + m.id + '">Mark as read</button>'}
+    </div>
+  `).join('');
+
+  listRoot.querySelectorAll('.mark-read-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = btn.getAttribute('data-id');
+      await sb.rpc('admin_mark_read', { p_username: username, p_password: password, p_id: id });
+      loadMessages();
+    });
+  });
+}
+
+loadMessages();
+
+document.getElementById('signoutBtn').addEventListener('click', () => {
+  sessionStorage.removeItem('tj_admin_user');
+  sessionStorage.removeItem('tj_admin_pass');
+  window.location.href = '/login.html';
+});
+</script>
+</body>
+</html>

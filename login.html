@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel — TJ Designs</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTkgMjU5Ij48cGF0aCBkPSJNMTExLDY2IEwxMTEsODMgTDExNCw4NiBMMTE1LDg2IEwxMjMsNzggWiBNMjMwLDgwIEwxNDQsMTY2IEwxMzEsMTU1IEwxNTMsMTM0IEwxMjksMTU0IEwxMjQsMTUwIEwxMzAsMTM1IEwxMTMsMTE4IEwxMjMsMTE3IEw5MCwxMDEgTDEwMiwxMDAgTDg1LDgzIEw5Nyw3MSBMMTA1LDc4IEwxMDUsNjEgTDk3LDUzIEw2Nyw4MyBMODQsOTkgTDcyLDEwMCBMNzcsMTA2IEw4OCwxMDYgTDEwNCwxMTYgTDk2LDExOCBMMTEzLDEzOSBMMTA1LDEzNCBMMTEzLDE0OSBMMTI1LDE1NCBMMTEzLDE1NSBMMTEzLDE2NiBMMjcsODAgTDExMiwxNjggWiIgZmlsbD0iYmxhY2siIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; min-height: 100vh;
+    background: #0a0a0c; font-family: 'Inter', sans-serif;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .grain {
+    position: fixed; inset: -20%; pointer-events: none; opacity: .05; mix-blend-mode: overlay; z-index: 0;
+  }
+  .login-card {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 360px;
+    background: rgba(13, 13, 12, 0.6);
+    border: 1px solid #262520;
+    border-radius: 14px;
+    padding: 2.4rem 2rem;
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+  }
+  .mark { width: 28px; height: 28px; color: #e2622a; margin: 0 auto 1.4rem; display: block; }
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.6rem; letter-spacing: 0.02em;
+    color: #f2f1ec; text-align: center; margin: 0 0 1.6rem;
+  }
+  .field { margin-bottom: 1rem; }
+  .field label {
+    display: block; font-size: 0.72rem; letter-spacing: 0.04em;
+    text-transform: uppercase; color: #999790; margin-bottom: 0.4rem;
+  }
+  .input {
+    width: 100%; background: rgba(10, 10, 12, 0.6);
+    border: 1px solid #333; border-radius: 8px;
+    padding: 0.65rem 0.8rem; font-family: 'Inter', sans-serif;
+    font-size: 0.9rem; color: #f2f1ec; transition: border-color 0.25s ease;
+  }
+  .input::placeholder { color: #6b6a63; }
+  .input:focus { outline: none; border-color: #e2622a; }
+  .cta-btn {
+    width: 100%; margin-top: 0.6rem;
+    position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 14px 20px; border-radius: 999px; background: #14130f; border: 1px solid #333;
+    color: #f2f1ec; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
+    cursor: pointer; transition: border-color .3s, box-shadow .3s;
+  }
+  .cta-btn:hover { box-shadow: 0 0 28px rgba(226,98,42,.32); border-color: #4a2f22; }
+  .cta-btn:disabled { opacity: 0.6; cursor: default; }
+  .error-msg {
+    font-size: 0.8rem; color: #e2622a; margin-top: 0.9rem; text-align: center; display: none;
+  }
+  .back-link {
+    display: block; text-align: center; margin-top: 1.6rem;
+    font-size: 0.78rem; color: #666; text-decoration: none;
+  }
+  .back-link:hover { color: #999; }
+</style>
+</head>
+<body>
+
+<svg class="grain" width="100%" height="100%">
+  <filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" stitchTiles="stitch"></feTurbulence></filter>
+  <rect width="100%" height="100%" filter="url(#noise)"></rect>
+</svg>
+
+<div class="login-card">
+  <svg class="mark" viewBox="0 0 259 259" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M111,66 L111,83 L114,86 L115,86 L123,78 Z M230,80 L144,166 L131,155 L153,134 L129,154 L124,150 L130,135 L113,118 L123,117 L90,101 L102,100 L85,83 L97,71 L105,78 L105,61 L97,53 L67,83 L84,99 L72,100 L77,106 L88,106 L104,116 L96,118 L113,139 L105,134 L113,149 L125,154 L113,155 L113,166 L27,80 L112,168 Z" fill="currentColor" fill-rule="evenodd"/>
+  </svg>
+  <h1>Panel</h1>
+  <form id="loginForm">
+    <div class="field">
+      <label for="username">Username</label>
+      <input class="input" id="username" name="username" type="text" autocomplete="username" required>
+    </div>
+    <div class="field">
+      <label for="password">Password</label>
+      <input class="input" id="password" name="password" type="password" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="cta-btn" id="loginBtn"><span id="loginBtnText">Sign in</span></button>
+    <div class="error-msg" id="errorMsg">Wrong username or password.</div>
+  </form>
+  <a href="/" class="back-link">&larr; Back to site</a>
+</div>
+
+<script>
+const sb = supabase.createClient(
+  'https://ijzdtnkdnzlkyfqdcoan.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM'
+);
+
+const loginForm = document.getElementById('loginForm');
+const loginBtn = document.getElementById('loginBtn');
+const loginBtnText = document.getElementById('loginBtnText');
+const errorMsg = document.getElementById('errorMsg');
+
+loginForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  errorMsg.style.display = 'none';
+  loginBtn.disabled = true;
+  loginBtnText.textContent = 'Checking...';
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+
+  try {
+    const { data, error } = await sb.rpc('admin_login', {
+      p_username: username,
+      p_password: password
+    });
+
+    if (error || !data) throw new Error('invalid');
+
+    sessionStorage.setItem('tj_admin_user', username);
+    sessionStorage.setItem('tj_admin_pass', password);
+    window.location.href = '/dashboard.html';
+  } catch (err) {
+    errorMsg.style.display = 'block';
+    loginBtn.disabled = false;
+    loginBtnText.textContent = 'Sign in';
+  }
+});
+</script>
+</body>
+</html>

@@ -565,6 +565,21 @@
     color: #666;
   }
 
+  .panel-link {
+    display: block;
+    text-align: center;
+    padding: 1.1rem 0 1.6rem;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #38372f;
+    text-decoration: none;
+    transition: color 0.3s ease;
+  }
+  .panel-link:hover { color: #666; }
+  .panel-link::after { display: none; }
+
   /* ---------- MOBILE / SMALL SCREEN ---------- */
   @media (max-width: 860px) {
     .site-mark {
@@ -822,6 +837,7 @@
         </svg>© 2026 Tristan Johnson
       </div>
     </div>
+    <a href="/login.html" class="panel-link">panel</a>
   </footer>
 </main>
 
