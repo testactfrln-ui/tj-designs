@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TJ Designs</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTkgMjU5Ij48cGF0aCBkPSJNMTExLDY2IEwxMTEsODMgTDExNCw4NiBMMTE1LDg2IEwxMjMsNzggWiBNMjMwLDgwIEwxNDQsMTY2IEwxMzEsMTU1IEwxNTMsMTM0IEwxMjksMTU0IEwxMjQsMTUwIEwxMzAsMTM1IEwxMTMsMTE4IEwxMjMsMTE3IEw5MCwxMDEgTDEwMiwxMDAgTDg1LDgzIEw5Nyw3MSBMMTA1LDc4IEwxMDUsNjEgTDk3LDUzIEw2Nyw4MyBMODQsOTkgTDcyLDEwMCBMNzcsMTA2IEw4OCwxMDYgTDEwNCwxMTYgTDk2LDExOCBMMTEzLDEzOSBMMTA1LDEzNCBMMTEzLDE0OSBMMTI1LDE1NCBMMTEzLDE1NSBMMTEzLDE2NiBMMjcsODAgTDExMiwxNjggWiIgZmlsbD0iYmxhY2siIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0a0a0c;
+    color: #f2f1ec;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+    min-height: 100vh;
+  }
+
+  .site-mark {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    width: 24px;
+    height: 24px;
+    z-index: 900;
+    color: #f2f1ec;
+    opacity: 0.8;
+    transition: opacity 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  }
+
+  .site-mark svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .site-mark:hover {
+    opacity: 1;
+    color: #e2622a;
+    transform: scale(1.06);
+  }
+
+  .grain {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.06;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .vignette {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+    z-index: 998;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
+  }
+
+  /* ---------- KINETIC INTRO ---------- */
+  #intro {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: #0a0a0c;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.6s ease, visibility 0.6s ease;
+  }
+
+  #intro.hide {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .intro-word {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 10vw, 7rem);
+    letter-spacing: 0.05em;
+    color: #f2f1ec;
+    display: flex;
+  }
+
+  .intro-word span {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(6px);
+  }
+
+  /* ---------- MAIN CONTENT ---------- */
+  main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 8rem 2rem;
+    opacity: 0;
+    transition: opacity 1s ease 0.3s;
+  }
+
+  main.show { opacity: 1; }
+
+  h1.hero {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 8vw, 6rem);
+    letter-spacing: 0.02em;
+    line-height: 1;
+    margin-bottom: 1.5rem;
+  }
+
+  .accent { color: #e2622a; }
+
+  p.sub {
+    font-size: 1.1rem;
+    color: #999790;
+    max-width: 480px;
+    margin-bottom: 4rem;
+  }
+
+  /* underline draw-on link */
+  .draw-link {
+    position: relative;
+    color: #f2f1ec;
+    text-decoration: none;
+    padding-bottom: 4px;
+  }
+
+  .draw-link::after {
+    content: '';
+    position: absolute;
+    left: 0; bottom: 0;
+    width: 100%;
+    height: 1px;
+    background: #e2622a;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.35s ease;
+  }
+
+  .draw-link:hover::after {
+    transform: scaleX(1);
+  }
+
+  /* magnetic button */
+  .magnetic-wrap {
+    display: inline-block;
+    margin-top: 1.5rem;
+  }
+
+  .magnetic-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1.15rem 2.6rem 1.15rem 1.6rem;
+    border: 1px solid #45433a;
+    border-radius: 999px;
+    background: #0d0d0c;
+    color: #f2f1ec;
+    text-decoration: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    overflow: hidden;
+    isolation: isolate;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+    box-shadow: 0 0 0 0 rgba(226, 98, 42, 0);
+  }
+
+  .magnetic-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(100deg, transparent 30%, rgba(226, 98, 42, 0.35) 50%, transparent 70%);
+    transform: translateX(-120%);
+    transition: transform 0.7s ease;
+  }
+
+  .magnetic-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(120deg, #e2622a, transparent 40%, transparent 60%, #e2622a);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+  }
+
+  .magnetic-btn:hover {
+    border-color: transparent;
+    box-shadow: 0 8px 30px -8px rgba(226, 98, 42, 0.45);
+  }
+
+  .magnetic-btn:hover::before {
+    transform: translateX(120%);
+  }
+
+  .magnetic-btn:hover::after {
+    opacity: 1;
+  }
+
+  .btn-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #e2622a;
+    flex-shrink: 0;
+    box-shadow: 0 0 0 0 rgba(226, 98, 42, 0.6);
+    animation: pulse-dot 2.4s ease-out infinite;
+  }
+
+  @keyframes pulse-dot {
+    0% { box-shadow: 0 0 0 0 rgba(226, 98, 42, 0.55); }
+    70% { box-shadow: 0 0 0 8px rgba(226, 98, 42, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(226, 98, 42, 0); }
+  }
+
+  .btn-arrow {
+    flex-shrink: 0;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .magnetic-btn:hover .btn-arrow {
+    transform: translateX(4px);
+  }
+
+  /* stats / count-up */
+  .stats {
+    display: flex;
+    gap: 4rem;
+    margin-top: 6rem;
+    flex-wrap: wrap;
+  }
+
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3rem;
+    color: #e2622a;
+    line-height: 1;
+  }
+
+  .stat-label {
+    font-size: 0.85rem;
+    color: #999790;
+    margin-top: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  section.projects {
+    margin-top: 8rem;
+  }
+
+  .project-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 2rem 0;
+    border-bottom: 1px solid #1e1d1a;
+  }
+
+  .project-row h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.02em;
+    font-weight: 400;
+  }
+
+  .project-row span {
+    color: #666;
+    font-size: 0.85rem;
+  }
+
+  /* ---------- SCROLL-SCRUBBED BUILD SECTION ---------- */
+  .build {
+    position: relative;
+    height: 400vh;
+    margin-top: 8rem;
+  }
+
+  .build-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 3rem;
+    align-items: center;
+    padding: 0 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .build-kicker {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999790;
+  }
+
+  .build-copy h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    line-height: 1.15;
+    margin: 0.8rem 0 0;
+    letter-spacing: 0.01em;
+  }
+
+  .build-copy p {
+    font-size: 0.9rem;
+    color: #999790;
+    margin: 1rem 0 2rem;
+    max-width: 260px;
+    line-height: 1.5;
+  }
+
+  .build-stages {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+    margin-bottom: 2rem;
+  }
+
+  .build-stage {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    font-size: 0.85rem;
+    color: #555;
+    transition: color 0.3s ease;
+  }
+
+  .build-stage-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #333;
+    flex-shrink: 0;
+    transition: background 0.3s ease;
+  }
+
+  .build-stage.active { color: #f2f1ec; }
+  .build-stage.active .build-stage-dot { background: #e2622a; }
+  .build-stage.done { color: #777; }
+  .build-stage.done .build-stage-dot { background: #6b4229; }
+
+  .build-progress-track {
+    height: 2px;
+    background: #1e1d1a;
+    border-radius: 2px;
+    overflow: hidden;
+    max-width: 200px;
+  }
+
+  .build-progress-fill {
+    height: 100%;
+    background: #e2622a;
+    width: 0%;
+  }
+
+  .build-mockup {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #14130f;
+    border: 1px dashed #333;
+    border-radius: 2px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: border-radius 0.1s linear, border-color 0.1s linear, box-shadow 0.1s linear;
+  }
+
+  .build-mockup-bar {
+    height: 34px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0 1rem;
+    border-bottom: 1px solid #222;
+  }
+
+  .build-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #333;
+  }
+
+  .build-mockup-body {
+    position: relative;
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    min-height: 0;
+  }
+
+  .build-bar {
+    background: #2a2924;
+    border-radius: 3px;
+    transition: opacity 0.15s linear;
+  }
+
+  .build-content {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.15s linear;
+    display: flex;
+    align-items: center;
+  }
+
+  .build-nav-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .build-nav-items {
+    display: flex;
+    gap: 1.2rem;
+  }
+
+  .build-rel { position: relative; }
+
+  .build-logo-bar { height: 18px; width: 64px; }
+  .build-navitem-bar { height: 11px; width: 38px; }
+  .build-cta-bar { height: 11px; width: 18px; border-radius: 999px; background: #6b4229; }
+
+  .build-headline-bar { height: 24px; width: 84%; max-width: 320px; }
+  .build-sub-bar { height: 12px; width: 92%; max-width: 340px; }
+  .build-cta2-bar { height: 24px; width: 110px; margin-top: 0.3rem; }
+  .build-cta2-bar.filled { border: 1px solid #e2622a; opacity: 0; background: transparent; }
+
+  .build-image {
+    position: relative;
+    flex: 1;
+    min-height: 0;
+    border-radius: 4px;
+    overflow: hidden;
+    background: #2a2924;
+  }
+
+  .build-image-color {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #6b4229, #14130f 70%);
+    opacity: 0;
+    transition: opacity 0.15s linear;
+  }
+
+  .build-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.8rem;
+    flex-shrink: 0;
+  }
+
+  .build-card {
+    background: #17161280;
+    border: 1px solid #222;
+    border-radius: 3px;
+    padding: 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .build-card-icon {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+    background: #e2622a;
+    opacity: 0;
+    transition: opacity 0.15s linear;
+  }
+
+  .build-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid #e2622a;
+    font-size: 0.7rem;
+    color: #e2622a;
+    opacity: 0;
+    transition: opacity 0.15s linear;
+  }
+
+  .build-bracket {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border-color: #e2622a;
+    border-style: solid;
+    border-width: 0;
+    opacity: 0;
+    transition: opacity 0.15s linear;
+  }
+
+  .build-bracket.tl { top: -10px; left: -10px; border-top-width: 1px; border-left-width: 1px; }
+  .build-bracket.tr { top: -10px; right: -10px; border-top-width: 1px; border-right-width: 1px; }
+  .build-bracket.bl { bottom: -10px; left: -10px; border-bottom-width: 1px; border-left-width: 1px; }
+  .build-bracket.br { bottom: -10px; right: -10px; border-bottom-width: 1px; border-right-width: 1px; }
+
+  /* ---------- FOOTER ---------- */
+  .site-footer {
+    border-top: 1px solid #1e1d1a;
+    margin-top: 6rem;
+  }
+
+  .footer-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 4.5rem 2rem;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0.01em;
+    color: #f2f1ec;
+    margin: 0 0 1rem;
+  }
+
+  .footer-email {
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    color: #e2622a;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  .footer-email:hover {
+    border-color: #e2622a;
+  }
+
+  .footer-copy {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.85rem;
+    color: #666;
+  }
+
+  /* ---------- MOBILE / SMALL SCREEN ---------- */
+  @media (max-width: 860px) {
+    .site-mark {
+      top: 1.25rem;
+      left: 1.25rem;
+      width: 20px;
+      height: 20px;
+    }
+
+    main {
+      padding: 5.5rem 1.25rem 4rem;
+    }
+
+    h1.hero {
+      line-height: 1.05;
+    }
+
+    p.sub {
+      font-size: 1rem;
+      margin-bottom: 3rem;
+    }
+
+    .magnetic-btn {
+      padding: 1rem 1.8rem 1rem 1.2rem;
+      font-size: 0.88rem;
+      gap: 0.65rem;
+    }
+
+    .stats {
+      gap: 2.2rem;
+      margin-top: 4rem;
+    }
+
+    .stat-num {
+      font-size: 2.3rem;
+    }
+
+    /* build section: stack copy above the mockup, keep it pinned so the
+       scroll-driven sequence still has room to play out */
+    .build {
+      height: 340vh;
+      margin-top: 5rem;
+    }
+
+    .build-sticky {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+      height: 100vh;
+      padding: 5.5rem 1.25rem 1.5rem;
+      gap: 1.25rem;
+      align-content: start;
+    }
+
+    .build-copy h2 {
+      font-size: 1.6rem;
+      margin-top: 0.5rem;
+    }
+
+    .build-copy p {
+      font-size: 0.82rem;
+      margin: 0.6rem 0 1.1rem;
+      max-width: none;
+    }
+
+    .build-stages {
+      flex-direction: row;
+      flex-wrap: wrap;
+      gap: 0.5rem 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .build-stage {
+      font-size: 0.72rem;
+    }
+
+    .build-mockup-body {
+      padding: 0.9rem;
+      gap: 0.7rem;
+    }
+
+    .build-nav-items {
+      gap: 0.6rem;
+    }
+
+    #headlineText { font-size: 0.95rem !important; }
+    #subText { font-size: 0.62rem !important; }
+    #navLogoText { font-size: 0.8rem !important; }
+    #navItemText1, #navItemText2 { font-size: 0.62rem !important; }
+
+    .build-cards {
+      gap: 0.5rem;
+    }
+
+    .build-card {
+      padding: 0.5rem;
+      gap: 0.35rem;
+    }
+
+    .footer-inner {
+      padding: 3rem 1.25rem;
+      gap: 1.5rem;
+    }
+
+    .footer-heading {
+      font-size: 1.6rem;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .build-stages {
+      font-size: 0.68rem;
+    }
+
+    .build-cards {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .build-card:last-child {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="vignette"></div>
+
+<a href="index.html" class="site-mark" aria-label="Home">
+  <svg viewBox="0 0 259 259" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M111,66 L111,83 L114,86 L115,86 L123,78 Z M230,80 L144,166 L131,155 L153,134 L129,154 L124,150 L130,135 L113,118 L123,117 L90,101 L102,100 L85,83 L97,71 L105,78 L105,61 L97,53 L67,83 L84,99 L72,100 L77,106 L88,106 L104,116 L96,118 L113,139 L105,134 L113,149 L125,154 L113,155 L113,166 L27,80 L112,168 Z" fill="currentColor" fill-rule="evenodd"/>
+  </svg>
+</a>
+
+<div id="intro">
+  <div class="intro-word" id="introWord"></div>
+</div>
+
+<main id="main">
+  <h1 class="hero">I build sites that make people <span class="accent">stop scrolling.</span></h1>
+  <p class="sub">Full custom design and development for brands who want their site to feel as considered as their product.</p>
+
+  <div class="magnetic-wrap">
+    <a href="contact.html" class="magnetic-btn" id="magBtn">
+      <span class="btn-dot"></span>
+      <span class="btn-label">Start a project</span>
+      <svg class="btn-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8H13M13 8L9 4M13 8L9 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="stats">
+    <div>
+      <div class="stat-num" data-count="35">0</div>
+      <div class="stat-label">Projects shipped</div>
+    </div>
+    <div>
+      <div class="stat-num" data-count="5">0</div>
+      <div class="stat-label">Years building</div>
+    </div>
+    <div>
+      <div class="stat-num" data-count="100">0</div>
+      <div class="stat-label">% custom code</div>
+    </div>
+  </div>
+
+  <section class="build" id="build">
+    <div class="build-sticky">
+      <div class="build-copy">
+        <div class="build-kicker">Live process</div>
+        <h2>Built different.</h2>
+        <p>Scroll to watch a real screen move from wireframe to shipped, stage by stage.</p>
+        <div class="build-stages" id="buildStages">
+          <div class="build-stage" data-stage="0"><span class="build-stage-dot"></span>Wireframe</div>
+          <div class="build-stage" data-stage="1"><span class="build-stage-dot"></span>Structure</div>
+          <div class="build-stage" data-stage="2"><span class="build-stage-dot"></span>Color</div>
+          <div class="build-stage" data-stage="3"><span class="build-stage-dot"></span>Content</div>
+          <div class="build-stage" data-stage="4"><span class="build-stage-dot"></span>Imagery</div>
+          <div class="build-stage" data-stage="5"><span class="build-stage-dot"></span>Polish</div>
+        </div>
+        <div class="build-progress-track">
+          <div class="build-progress-fill" id="buildProgressFill"></div>
+        </div>
+      </div>
+
+      <div class="build-mockup" id="buildMockup">
+        <div class="build-bracket tl"></div>
+        <div class="build-bracket tr"></div>
+        <div class="build-bracket bl"></div>
+        <div class="build-bracket br"></div>
+        <div class="build-badge" id="buildBadge">Shipped</div>
+
+        <div class="build-mockup-bar">
+          <span class="build-dot"></span><span class="build-dot"></span><span class="build-dot"></span>
+        </div>
+
+        <div class="build-mockup-body">
+          <div class="build-nav-row">
+            <div class="build-rel">
+              <div class="build-bar build-logo-bar" id="navLogoBar"></div>
+              <div class="build-content" id="navLogoText" style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#e2622a;">Prtfl.</div>
+            </div>
+            <div class="build-nav-items">
+              <div class="build-rel">
+                <div class="build-bar build-navitem-bar" id="navItemBar1"></div>
+                <div class="build-content" id="navItemText1" style="font-size:0.75rem;color:#ccc;">Work</div>
+              </div>
+              <div class="build-rel">
+                <div class="build-bar build-navitem-bar" id="navItemBar2"></div>
+                <div class="build-content" id="navItemText2" style="font-size:0.75rem;color:#ccc;">About</div>
+              </div>
+              <div class="build-cta-bar" id="navCtaBar"></div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:0.6rem;">
+            <div class="build-rel">
+              <div class="build-bar build-headline-bar" id="headlineBar"></div>
+              <div class="build-content" id="headlineText" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#f2f1ec;">Design, done right.</div>
+            </div>
+            <div class="build-rel">
+              <div class="build-bar build-sub-bar" id="subBar"></div>
+              <div class="build-content" id="subText" style="font-size:0.75rem;color:#999790;">A six-stage look at how a screen moves from sketch to shipped.</div>
+            </div>
+            <div class="build-rel">
+              <div class="build-bar build-cta2-bar" id="ctaBar"></div>
+              <div class="build-cta2-bar filled" id="ctaFilled" style="display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#e2622a;">View the work</div>
+            </div>
+          </div>
+
+          <div class="build-image">
+            <div class="build-image-color" id="buildImageColor"></div>
+          </div>
+
+          <div class="build-cards">
+            <div class="build-card"><span class="build-card-icon" data-card-icon></span><div class="build-bar" style="height:11px;width:70%;" data-card-bar></div><div class="build-bar" style="height:9px;width:90%;" data-card-bar></div></div>
+            <div class="build-card"><span class="build-card-icon" data-card-icon></span><div class="build-bar" style="height:11px;width:70%;" data-card-bar></div><div class="build-bar" style="height:9px;width:90%;" data-card-bar></div></div>
+            <div class="build-card"><span class="build-card-icon" data-card-icon></span><div class="build-bar" style="height:11px;width:70%;" data-card-bar></div><div class="build-bar" style="height:9px;width:90%;" data-card-bar></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div>
+        <h2 class="footer-heading">Have a screen worth building?</h2>
+        <a href="mailto:tljohnsonui@gmail.com" class="footer-email">tljohnsonui@gmail.com</a>
+      </div>
+      <div class="footer-copy">
+        <svg viewBox="0 0 259 259" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:13px;height:13px;vertical-align:-1px;margin-right:6px;opacity:0.7;">
+          <path d="M111,66 L111,83 L114,86 L115,86 L123,78 Z M230,80 L144,166 L131,155 L153,134 L129,154 L124,150 L130,135 L113,118 L123,117 L90,101 L102,100 L85,83 L97,71 L105,78 L105,61 L97,53 L67,83 L84,99 L72,100 L77,106 L88,106 L104,116 L96,118 L113,139 L105,134 L113,149 L125,154 L113,155 L113,166 L27,80 L112,168 Z" fill="currentColor" fill-rule="evenodd"/>
+        </svg>© 2026 Tristan Johnson
+      </div>
+    </div>
+  </footer>
+</main>
+
+<script>
+  // ---------- KINETIC INTRO ----------
+  const word = "CRAFTED.";
+  const introWordEl = document.getElementById('introWord');
+  word.split('').forEach((ch, i) => {
+    const span = document.createElement('span');
+    span.textContent = ch === ' ' ? '\u00A0' : ch;
+    span.style.transitionDelay = (i * 0.06) + 's';
+    span.style.transition = 'opacity 0.5s ease, transform 0.5s ease, filter 0.5s ease';
+    introWordEl.appendChild(span);
+  });
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      document.querySelectorAll('.intro-word span').forEach(s => {
+        s.style.opacity = '1';
+        s.style.transform = 'translateY(0)';
+        s.style.filter = 'blur(0px)';
+      });
+    }, 150);
+  });
+
+  setTimeout(() => {
+    document.getElementById('intro').classList.add('hide');
+    document.getElementById('main').classList.add('show');
+  }, 2200);
+
+  // ---------- MAGNETIC BUTTON ----------
+  const btn = document.getElementById('magBtn');
+  const wrap = btn.parentElement;
+
+  wrap.addEventListener('mousemove', (e) => {
+    const rect = btn.getBoundingClientRect();
+    const x = e.clientX - rect.left - rect.width / 2;
+    const y = e.clientY - rect.top - rect.height / 2;
+    btn.style.transform = `translate(${x * 0.3}px, ${y * 0.4}px)`;
+  });
+
+  wrap.addEventListener('mouseleave', () => {
+    btn.style.transform = 'translate(0, 0)';
+    btn.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+  });
+
+  wrap.addEventListener('mouseenter', () => {
+    btn.style.transition = 'transform 0.1s ease';
+  });
+
+  // ---------- COUNT UP ON SCROLL ----------
+  const counters = document.querySelectorAll('.stat-num');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const target = parseInt(el.dataset.count, 10);
+        let current = 0;
+        const duration = 1200;
+        const stepTime = 16;
+        const steps = duration / stepTime;
+        const increment = target / steps;
+
+        const tick = () => {
+          current += increment;
+          if (current < target) {
+            el.textContent = Math.floor(current);
+            requestAnimationFrame(tick);
+          } else {
+            el.textContent = target;
+          }
+        };
+        tick();
+        observer.unobserve(el);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counters.forEach(c => observer.observe(c));
+
+  // ---------- SCROLL-SCRUBBED BUILD SEQUENCE ----------
+  const buildSection = document.querySelector('.build');
+  const buildMockup = document.getElementById('buildMockup');
+  const stageEls = Array.from(document.querySelectorAll('.build-stage'));
+  const progressFill = document.getElementById('buildProgressFill');
+  const badge = document.getElementById('buildBadge');
+  const imageColor = document.getElementById('buildImageColor');
+  const brackets = document.querySelectorAll('.build-bracket');
+
+  const pairs = [
+    ['navLogoBar', 'navLogoText'],
+    ['navItemBar1', 'navItemText1'],
+    ['navItemBar2', 'navItemText2'],
+    ['headlineBar', 'headlineText'],
+    ['subBar', 'subText'],
+  ];
+  const ctaBar = document.getElementById('ctaBar');
+  const ctaFilled = document.getElementById('ctaFilled');
+  const cardIcons = document.querySelectorAll('[data-card-icon]');
+
+  function smooth(p, a, b) {
+    if (b === a) return p >= b ? 1 : 0;
+    return Math.max(0, Math.min(1, (p - a) / (b - a)));
+  }
+
+  let ticking = false;
+
+  function updateBuild() {
+    ticking = false;
+    if (!buildSection) return;
+    const rect = buildSection.getBoundingClientRect();
+    const vh = window.innerHeight;
+    const total = rect.height - vh;
+    const scrolled = -rect.top;
+    let p = total > 0 ? scrolled / total : 0;
+    p = Math.max(0, Math.min(1, p));
+
+    const structure = smooth(p, 0.05, 0.25);
+    const color = smooth(p, 0.25, 0.42);
+    const navC = smooth(p, 0.30, 0.42);
+    const headlineC = smooth(p, 0.40, 0.52);
+    const subC = smooth(p, 0.46, 0.58);
+    const imagery = smooth(p, 0.62, 0.76);
+    const polish = smooth(p, 0.78, 1.0);
+    const badgeOpacity = smooth(p, 0.9, 1.0);
+
+    progressFill.style.width = (p * 100) + '%';
+
+    const activeIdx = Math.min(5, Math.floor(p * 6));
+    stageEls.forEach((el, i) => {
+      el.classList.toggle('active', i === activeIdx);
+      el.classList.toggle('done', i < activeIdx);
+    });
+
+    buildMockup.style.borderRadius = (2 + structure * 10) + 'px';
+    buildMockup.style.borderStyle = structure < 0.98 ? 'dashed' : 'solid';
+    buildMockup.style.borderColor = '#333';
+    buildMockup.style.boxShadow = polish > 0.01
+      ? `0 ${Math.round(24 * polish)}px ${Math.round(48 * polish)}px -16px rgba(0,0,0,${(0.5 * polish).toFixed(2)}), 0 0 0 1px rgba(226,98,42,${(0.12 * polish).toFixed(2)})`
+      : 'none';
+
+    brackets.forEach(b => b.style.opacity = 1 - structure);
+
+    const navBarOp = 1 - navC, navTxtOp = navC;
+    document.getElementById('navLogoBar').style.opacity = 1 - color;
+    document.getElementById('navLogoText').style.opacity = color;
+    document.getElementById('navItemBar1').style.opacity = navBarOp;
+    document.getElementById('navItemText1').style.opacity = navTxtOp;
+    document.getElementById('navItemBar2').style.opacity = navBarOp;
+    document.getElementById('navItemText2').style.opacity = navTxtOp;
+
+    document.getElementById('headlineBar').style.opacity = 1 - headlineC;
+    document.getElementById('headlineText').style.opacity = headlineC;
+    document.getElementById('subBar').style.opacity = 1 - subC;
+    document.getElementById('subText').style.opacity = subC;
+
+    ctaBar.style.opacity = 1 - color;
+    ctaFilled.style.opacity = color;
+
+    imageColor.style.opacity = imagery;
+
+    cardIcons.forEach((el, i) => {
+      const a = 0.66 + i * 0.04, b = 0.80 + i * 0.04;
+      el.style.opacity = smooth(p, a, b);
+    });
+
+    badge.style.opacity = badgeOpacity;
+  }
+
+  function onScroll() {
+    if (!ticking) {
+      ticking = true;
+      requestAnimationFrame(updateBuild);
+    }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  updateBuild();
+</script>
+
+</body>
+</html>
