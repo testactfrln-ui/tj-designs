@@ -566,6 +566,91 @@
     color: #666;
   }
 
+  /* ---------- WORK / PORTFOLIO ---------- */
+  .work-section {
+    margin-top: 8rem;
+    display: none;
+  }
+
+  .work-section.has-items { display: block; }
+
+  .work-kicker {
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #999790;
+  }
+
+  .work-section h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    letter-spacing: 0.01em;
+    margin: 0.6rem 0 2.5rem;
+  }
+
+  .work-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.75rem;
+  }
+
+  .work-item {
+    background: #0d0d0c;
+    border: 1px solid #1e1d1a;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: border-color 0.3s ease, transform 0.3s ease;
+  }
+
+  .work-item:hover {
+    border-color: #4a2f22;
+    transform: translateY(-2px);
+  }
+
+  .work-item-embed {
+    width: 100%;
+    aspect-ratio: 16/10;
+    background: #000;
+    border: 0;
+    display: block;
+  }
+
+  .work-item-image {
+    width: 100%;
+    aspect-ratio: 16/10;
+    object-fit: cover;
+    display: block;
+  }
+
+  .work-item-body {
+    padding: 1.2rem 1.3rem 1.4rem;
+  }
+
+  .work-item-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.3rem;
+    letter-spacing: 0.01em;
+  }
+
+  .work-item-desc {
+    font-size: 0.85rem;
+    color: #999790;
+    margin-top: 0.4rem;
+    line-height: 1.5;
+  }
+
+  .work-item-link {
+    display: inline-block;
+    margin-top: 0.9rem;
+    font-size: 0.82rem;
+    color: #e2622a;
+    text-decoration: none;
+    border-bottom: 1px solid transparent;
+    transition: border-color 0.3s ease;
+  }
+
+  .work-item-link:hover { border-color: #e2622a; }
+
   .panel-link {
     display: block;
     text-align: center;
@@ -826,6 +911,12 @@
     </div>
   </section>
 
+  <section class="work-section" id="workSection">
+    <div class="work-kicker">Selected work</div>
+    <h2>Recent builds.</h2>
+    <div class="work-grid" id="workGrid"></div>
+  </section>
+
   <footer class="site-footer">
     <div class="footer-inner">
       <div>
@@ -889,13 +980,15 @@
     btn.style.transition = 'transform 0.1s ease';
   });
 
+  // ---------- SUPABASE (shared by live stats + portfolio) ----------
+  const sb = supabase.createClient(
+    'https://ijzdtnkdnzlkyfqdcoan.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM'
+  );
+
   // ---------- LIVE STATS (editable from the admin panel) ----------
   (async function loadStats() {
     try {
-      const sb = supabase.createClient(
-        'https://ijzdtnkdnzlkyfqdcoan.supabase.co',
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM'
-      );
       const { data, error } = await sb.from('site_stats').select('*').eq('id', 1).single();
       if (error || !data) return;
       const map = {
@@ -911,6 +1004,53 @@
         }
       });
     } catch (e) { /* keep the static defaults if Supabase is unreachable */ }
+  })();
+
+  // ---------- PORTFOLIO / WORK (editable from the admin panel) ----------
+  (async function loadWork() {
+    try {
+      const { data, error } = await sb
+        .from('portfolio_items')
+        .select('*')
+        .eq('is_hidden', false)
+        .order('sort_order', { ascending: true });
+      if (error || !data || data.length === 0) return;
+
+      function escapeHtml(str) {
+        return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+      }
+
+      const grid = document.getElementById('workGrid');
+      grid.innerHTML = data.map(item => {
+        let media = '';
+        if (item.embed_type === 'image' && item.image_url) {
+          media = `<img class="work-item-image" src="${escapeHtml(item.image_url)}" alt="${escapeHtml(item.title)}">`;
+        } else if ((item.embed_type === 'codepen' || item.embed_type === 'html') && item.embed_code) {
+          const trimmed = item.embed_code.trim();
+          if (item.embed_type === 'codepen' && /^https?:\/\/codepen\.io/.test(trimmed) && !trimmed.includes('<')) {
+            const embedUrl = trimmed.replace('/pen/', '/embed/');
+            media = `<iframe class="work-item-embed" src="${embedUrl}" loading="lazy" sandbox="allow-scripts allow-same-origin" allowtransparency="true"></iframe>`;
+          } else {
+            media = `<iframe class="work-item-embed" srcdoc="${escapeHtml(trimmed)}" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>`;
+          }
+        }
+        const link = item.embed_type === 'link' && item.link_url
+          ? `<a class="work-item-link" href="${escapeHtml(item.link_url)}" target="_blank" rel="noopener">View project &rarr;</a>`
+          : (item.link_url ? `<a class="work-item-link" href="${escapeHtml(item.link_url)}" target="_blank" rel="noopener">View live &rarr;</a>` : '');
+        return `
+          <div class="work-item">
+            ${media}
+            <div class="work-item-body">
+              <div class="work-item-title">${escapeHtml(item.title)}</div>
+              ${item.description ? `<div class="work-item-desc">${escapeHtml(item.description)}</div>` : ''}
+              ${link}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      document.getElementById('workSection').classList.add('has-items');
+    } catch (e) { /* no portfolio items yet, or Supabase unreachable */ }
   })();
 
   // ---------- COUNT UP ON SCROLL ----------
