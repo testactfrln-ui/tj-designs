@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>TJ Designs</title>
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTkgMjU5Ij48cGF0aCBkPSJNMTExLDY2IEwxMTEsODMgTDExNCw4NiBMMTE1LDg2IEwxMjMsNzggWiBNMjMwLDgwIEwxNDQsMTY2IEwxMzEsMTU1IEwxNTMsMTM0IEwxMjksMTU0IEwxMjQsMTUwIEwxMzAsMTM1IEwxMTMsMTE4IEwxMjMsMTE3IEw5MCwxMDEgTDEwMiwxMDAgTDg1LDgzIEw5Nyw3MSBMMTA1LDc4IEwxMDUsNjEgTDk3LDUzIEw2Nyw4MyBMODQsOTkgTDcyLDEwMCBMNzcsMTA2IEw4OCwxMDYgTDEwNCwxMTYgTDk2LDExOCBMMTEzLDEzOSBMMTA1LDEzNCBMMTEzLDE0OSBMMTI1LDE1NCBMMTEzLDE1NSBMMTEzLDE2NiBMMjcsODAgTDExMiwxNjggWiIgZmlsbD0iYmxhY2siIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
 
@@ -887,6 +888,30 @@
   wrap.addEventListener('mouseenter', () => {
     btn.style.transition = 'transform 0.1s ease';
   });
+
+  // ---------- LIVE STATS (editable from the admin panel) ----------
+  (async function loadStats() {
+    try {
+      const sb = supabase.createClient(
+        'https://ijzdtnkdnzlkyfqdcoan.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM'
+      );
+      const { data, error } = await sb.from('site_stats').select('*').eq('id', 1).single();
+      if (error || !data) return;
+      const map = {
+        'Projects shipped': data.projects_shipped,
+        'Years building': data.years_building,
+        '% custom code': data.custom_code_percent
+      };
+      document.querySelectorAll('.stats > div').forEach(statEl => {
+        const label = statEl.querySelector('.stat-label')?.textContent.trim();
+        const num = statEl.querySelector('.stat-num');
+        if (label && num && map[label] !== undefined) {
+          num.dataset.count = map[label];
+        }
+      });
+    } catch (e) { /* keep the static defaults if Supabase is unreachable */ }
+  })();
 
   // ---------- COUNT UP ON SCROLL ----------
   const counters = document.querySelectorAll('.stat-num');

@@ -72,6 +72,35 @@
 
   .empty-state, .loading-state { text-align: center; color: #666; padding: 3rem 0; font-size: 0.9rem; }
 
+  .section-heading {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem; letter-spacing: 0.01em;
+    margin: 0 0 1rem;
+  }
+  .stats-card {
+    background: rgba(13, 13, 12, 0.6); border: 1px solid #262520; border-radius: 12px;
+    padding: 1.4rem 1.5rem; margin-bottom: 2.5rem;
+  }
+  .stats-edit-row { display: flex; gap: 1rem; flex-wrap: wrap; align-items: flex-end; }
+  .stats-field { flex: 1; min-width: 140px; }
+  .stats-field label {
+    display: block; font-size: 0.72rem; letter-spacing: 0.04em; text-transform: uppercase;
+    color: #999790; margin-bottom: 0.4rem;
+  }
+  .stats-field .input {
+    width: 100%; background: rgba(10, 10, 12, 0.6); border: 1px solid #333; border-radius: 8px;
+    padding: 0.6rem 0.75rem; font-family: 'Inter', sans-serif; font-size: 0.9rem; color: #f2f1ec;
+  }
+  .stats-field .input:focus { outline: none; border-color: #e2622a; }
+  .stats-save-btn {
+    padding: 0.65rem 1.4rem; border-radius: 999px; background: #14130f; border: 1px solid #333;
+    color: #f2f1ec; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 0.85rem;
+    cursor: pointer; transition: border-color .3s, box-shadow .3s; white-space: nowrap;
+  }
+  .stats-save-btn:hover { box-shadow: 0 0 20px rgba(226,98,42,.28); border-color: #4a2f22; }
+  .stats-save-btn:disabled { opacity: 0.6; cursor: default; }
+  .stats-saved-msg { font-size: 0.78rem; color: #8fbf8f; margin-top: 0.7rem; display: none; }
+
   @media (max-width: 600px) {
     .wrap { padding: 1.5rem 1rem 4rem; }
     .msg-top { flex-direction: column; align-items: flex-start; }
@@ -93,6 +122,26 @@
       </svg>TJ Designs — Panel
     </div>
     <button class="signout" id="signoutBtn">Sign out</button>
+  </div>
+
+  <h2 class="section-heading">Homepage stats</h2>
+  <div class="stats-card">
+    <form class="stats-edit-row" id="statsForm">
+      <div class="stats-field">
+        <label for="projectsShipped">Projects shipped</label>
+        <input class="input" id="projectsShipped" type="number" min="0" required>
+      </div>
+      <div class="stats-field">
+        <label for="yearsBuilding">Years building</label>
+        <input class="input" id="yearsBuilding" type="number" min="0" required>
+      </div>
+      <div class="stats-field">
+        <label for="customCodePercent">% custom code</label>
+        <input class="input" id="customCodePercent" type="number" min="0" max="100" required>
+      </div>
+      <button type="submit" class="stats-save-btn" id="statsSaveBtn">Save</button>
+    </form>
+    <div class="stats-saved-msg" id="statsSavedMsg">Saved — the homepage will show these on next load.</div>
   </div>
 
   <h1>Project inquiries</h1>
@@ -185,6 +234,45 @@ async function loadMessages() {
 }
 
 loadMessages();
+
+// ---------- HOMEPAGE STATS ----------
+const statsForm = document.getElementById('statsForm');
+const statsSaveBtn = document.getElementById('statsSaveBtn');
+const statsSavedMsg = document.getElementById('statsSavedMsg');
+const projectsShippedInput = document.getElementById('projectsShipped');
+const yearsBuildingInput = document.getElementById('yearsBuilding');
+const customCodePercentInput = document.getElementById('customCodePercent');
+
+async function loadStats() {
+  const { data, error } = await sb.from('site_stats').select('*').eq('id', 1).single();
+  if (error || !data) return;
+  projectsShippedInput.value = data.projects_shipped;
+  yearsBuildingInput.value = data.years_building;
+  customCodePercentInput.value = data.custom_code_percent;
+}
+loadStats();
+
+statsForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  statsSavedMsg.style.display = 'none';
+  statsSaveBtn.disabled = true;
+  statsSaveBtn.textContent = 'Saving...';
+
+  const { error } = await sb.rpc('admin_update_stats', {
+    p_username: username,
+    p_password: password,
+    p_projects_shipped: parseInt(projectsShippedInput.value, 10),
+    p_years_building: parseInt(yearsBuildingInput.value, 10),
+    p_custom_code_percent: parseInt(customCodePercentInput.value, 10)
+  });
+
+  statsSaveBtn.disabled = false;
+  statsSaveBtn.textContent = 'Save';
+
+  if (!error) {
+    statsSavedMsg.style.display = 'block';
+  }
+});
 
 document.getElementById('signoutBtn').addEventListener('click', () => {
   sessionStorage.removeItem('tj_admin_user');
