@@ -236,7 +236,8 @@
             <label for="workType">Embed type</label>
             <select id="workType">
               <option value="codepen">CodePen embed</option>
-              <option value="html">Custom HTML / code</option>
+              <option value="code">Code (HTML + CSS + JS)</option>
+              <option value="html">Raw HTML snippet</option>
               <option value="image">Image</option>
               <option value="link">External link</option>
             </select>
@@ -253,6 +254,25 @@
         <div class="field" id="workEmbedField">
           <label for="workEmbedCode">CodePen URL or embed / HTML code</label>
           <textarea id="workEmbedCode" placeholder="Paste a CodePen 'embed' <iframe> snippet, or any raw HTML/code block to render."></textarea>
+        </div>
+        <div id="workCodeFields" style="display:none;">
+          <p class="sub" style="margin:0 0 1rem;">Paste any combination — HTML only, CSS only, JS only, or all three. They're combined into one page and run live in a sandbox. Paste a full document into the HTML box if you prefer (the CSS/JS boxes are then added on top).</p>
+          <div class="field">
+            <label for="workHtmlCode">HTML</label>
+            <textarea id="workHtmlCode" style="min-height:140px;" spellcheck="false" placeholder="<div class=&quot;box&quot;>Hello</div>"></textarea>
+          </div>
+          <div class="field">
+            <label for="workCssCode">CSS</label>
+            <textarea id="workCssCode" style="min-height:120px;" spellcheck="false" placeholder=".box { color: orange; }"></textarea>
+          </div>
+          <div class="field">
+            <label for="workJsCode">JavaScript</label>
+            <textarea id="workJsCode" style="min-height:120px;" spellcheck="false" placeholder="document.querySelector('.box').addEventListener('click', () => alert('hi'));"></textarea>
+          </div>
+          <div class="field-row" style="align-items:center; margin-bottom:1rem;">
+            <button type="button" class="btn btn-ghost" id="workPreviewBtn">Live preview</button>
+          </div>
+          <div class="work-preview" id="workLivePreview" style="display:none; margin-bottom:1rem;"></div>
         </div>
         <div class="field" id="workImageField" style="display:none;">
           <label for="workImageUrl">Image URL</label>
@@ -469,8 +489,31 @@ const workSavedMsg = document.getElementById('workSavedMsg');
 const workErrorMsg = document.getElementById('workErrorMsg');
 const workListRoot = document.getElementById('workListRoot');
 
+const workCodeFields = document.getElementById('workCodeFields');
+const workHtmlCodeInput = document.getElementById('workHtmlCode');
+const workCssCodeInput = document.getElementById('workCssCode');
+const workJsCodeInput = document.getElementById('workJsCode');
+const workLivePreview = document.getElementById('workLivePreview');
+
+// Combine the three boxes into one self-contained document.
+function buildSrcdoc(html, css, js) {
+  html = html || ''; css = css || ''; js = js || '';
+  const hasDoc = /<html[\s>]|<!doctype/i.test(html);
+  const styleTag = css.trim() ? '<style>\n' + css + '\n</style>' : '';
+  const scriptTag = js.trim() ? '<script>\n' + js.replace(/<\/script/gi, '<\\/script') + '\n<\/script>' : '';
+  if (hasDoc) {
+    let out = html;
+    out = styleTag ? (/<\/head>/i.test(out) ? out.replace(/<\/head>/i, styleTag + '</head>') : styleTag + out) : out;
+    out = scriptTag ? (/<\/body>/i.test(out) ? out.replace(/<\/body>/i, scriptTag + '</body>') : out + scriptTag) : out;
+    return out;
+  }
+  return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<style>html,body{margin:0;padding:0;}</style>' + styleTag + '</head><body>' + html + scriptTag + '</body></html>';
+}
+
 function updateWorkFieldsVisibility() {
   const t = workTypeSelect.value;
+  workCodeFields.style.display = (t === 'code') ? 'block' : 'none';
   workEmbedField.style.display = (t === 'codepen' || t === 'html') ? 'block' : 'none';
   workImageField.style.display = (t === 'image') ? 'block' : 'none';
   workLinkField.style.display = (t === 'link') ? 'block' : 'none';
@@ -481,6 +524,8 @@ updateWorkFieldsVisibility();
 function resetWorkForm() {
   workIdInput.value = '';
   workForm.reset();
+  workLivePreview.style.display = 'none';
+  workLivePreview.innerHTML = '';
   updateWorkFieldsVisibility();
   workFormHeading.textContent = 'Add new work';
   workSaveBtn.textContent = 'Add work';
@@ -488,6 +533,13 @@ function resetWorkForm() {
 }
 
 workCancelBtn.addEventListener('click', resetWorkForm);
+
+document.getElementById('workPreviewBtn').addEventListener('click', () => {
+  const doc = buildSrcdoc(workHtmlCodeInput.value, workCssCodeInput.value, workJsCodeInput.value);
+  workLivePreview.innerHTML = '<iframe sandbox="allow-scripts allow-forms allow-modals allow-popups" style="height:340px;"></iframe>';
+  workLivePreview.querySelector('iframe').srcdoc = doc;
+  workLivePreview.style.display = 'block';
+});
 
 function renderWorkPreview(item) {
   if (item.embed_type === 'image' && item.image_url) {
@@ -500,7 +552,11 @@ function renderWorkPreview(item) {
       const embedUrl = trimmed.replace('/pen/', '/embed/');
       return `<div class="work-preview"><iframe src="${embedUrl}" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe></div>`;
     }
-    return `<div class="work-preview"><iframe srcdoc="${escapeHtml(trimmed)}" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe></div>`;
+    return `<div class="work-preview"><iframe srcdoc="${escapeHtml(trimmed)}" loading="lazy" sandbox="allow-scripts"></iframe></div>`;
+  }
+  if (item.embed_type === 'code' && (item.html_code || item.css_code || item.js_code)) {
+    const doc = buildSrcdoc(item.html_code, item.css_code, item.js_code);
+    return `<div class="work-preview"><iframe srcdoc="${escapeHtml(doc)}" loading="lazy" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe></div>`;
   }
   if (item.embed_type === 'link' && item.link_url) {
     return `<div style="margin-top:0.7rem;"><a class="work-link" href="${escapeHtml(item.link_url)}" target="_blank" rel="noopener">${escapeHtml(item.link_url)}</a></div>`;
@@ -547,6 +603,9 @@ async function loadWork() {
       workEmbedCodeInput.value = item.embed_code || '';
       workImageUrlInput.value = item.image_url || '';
       workLinkUrlInput.value = item.link_url || '';
+      workHtmlCodeInput.value = item.html_code || '';
+      workCssCodeInput.value = item.css_code || '';
+      workJsCodeInput.value = item.js_code || '';
       updateWorkFieldsVisibility();
       workFormHeading.textContent = 'Edit work';
       workSaveBtn.textContent = 'Save changes';
@@ -584,15 +643,18 @@ workForm.addEventListener('submit', async function (e) {
     p_embed_code: workEmbedCodeInput.value.trim() || null,
     p_link_url: workLinkUrlInput.value.trim() || null,
     p_image_url: workImageUrlInput.value.trim() || null,
-    p_sort_order: parseInt(workSortInput.value, 10) || 0
+    p_sort_order: parseInt(workSortInput.value, 10) || 0,
+    p_html_code: workHtmlCodeInput.value || null,
+    p_css_code: workCssCodeInput.value || null,
+    p_js_code: workJsCodeInput.value || null
   };
 
   let error;
   if (id) {
     payload.p_id = parseInt(id, 10);
-    ({ error } = await sb.rpc('admin_update_portfolio_item', payload));
+    ({ error } = await sb.rpc('admin_update_work', payload));
   } else {
-    ({ error } = await sb.rpc('admin_add_portfolio_item', payload));
+    ({ error } = await sb.rpc('admin_add_work', payload));
   }
 
   workSaveBtn.disabled = false;

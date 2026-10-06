@@ -1020,6 +1020,21 @@
         return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
       }
 
+      function buildSrcdoc(html, css, js) {
+        html = html || ''; css = css || ''; js = js || '';
+        const hasDoc = /<html[\s>]|<!doctype/i.test(html);
+        const styleTag = css.trim() ? '<style>\n' + css + '\n</style>' : '';
+        const scriptTag = js.trim() ? '<script>\n' + js.replace(/<\/script/gi, '<\\/script') + '\n<\/script>' : '';
+        if (hasDoc) {
+          let out = html;
+          out = styleTag ? (/<\/head>/i.test(out) ? out.replace(/<\/head>/i, styleTag + '</head>') : styleTag + out) : out;
+          out = scriptTag ? (/<\/body>/i.test(out) ? out.replace(/<\/body>/i, scriptTag + '</body>') : out + scriptTag) : out;
+          return out;
+        }
+        return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">' +
+          '<style>html,body{margin:0;padding:0;}</style>' + styleTag + '</head><body>' + html + scriptTag + '</body></html>';
+      }
+
       const grid = document.getElementById('workGrid');
       grid.innerHTML = data.map(item => {
         let media = '';
@@ -1031,8 +1046,11 @@
             const embedUrl = trimmed.replace('/pen/', '/embed/');
             media = `<iframe class="work-item-embed" src="${embedUrl}" loading="lazy" sandbox="allow-scripts allow-same-origin" allowtransparency="true"></iframe>`;
           } else {
-            media = `<iframe class="work-item-embed" srcdoc="${escapeHtml(trimmed)}" loading="lazy" sandbox="allow-scripts allow-same-origin"></iframe>`;
+            media = `<iframe class="work-item-embed" srcdoc="${escapeHtml(trimmed)}" loading="lazy" sandbox="allow-scripts"></iframe>`;
           }
+        } else if (item.embed_type === 'code' && (item.html_code || item.css_code || item.js_code)) {
+          const doc = buildSrcdoc(item.html_code, item.css_code, item.js_code);
+          media = `<iframe class="work-item-embed" srcdoc="${escapeHtml(doc)}" loading="lazy" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>`;
         }
         const link = item.embed_type === 'link' && item.link_url
           ? `<a class="work-item-link" href="${escapeHtml(item.link_url)}" target="_blank" rel="noopener">View project &rarr;</a>`
