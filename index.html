@@ -991,10 +991,19 @@
     try {
       const { data, error } = await sb.from('site_stats').select('*').eq('id', 1).single();
       if (error || !data) return;
+      // Years building is calculated from the start date, so it updates itself every anniversary.
+      let years = data.years_building;
+      if (data.building_since) {
+        const s = new Date(data.building_since + 'T00:00:00');
+        const now = new Date();
+        years = now.getFullYear() - s.getFullYear();
+        const m = now.getMonth() - s.getMonth();
+        if (m < 0 || (m === 0 && now.getDate() < s.getDate())) years--;
+        years = Math.max(0, years);
+      }
       const map = {
         'Projects shipped': data.projects_shipped,
-        'Years building': data.years_building,
-        '% custom code': data.custom_code_percent
+        'Years building': years
       };
       document.querySelectorAll('.stats > div').forEach(statEl => {
         const label = statEl.querySelector('.stat-label')?.textContent.trim();

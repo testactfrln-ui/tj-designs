@@ -205,12 +205,12 @@
           <input class="input" id="projectsShipped" type="number" min="0" required>
         </div>
         <div class="field">
-          <label for="yearsBuilding">Years building</label>
-          <input class="input" id="yearsBuilding" type="number" min="0" required>
+          <label for="buildingSince">Building since</label>
+          <input class="input" id="buildingSince" type="date" required>
         </div>
         <div class="field">
-          <label for="customCodePercent">% custom code</label>
-          <input class="input" id="customCodePercent" type="number" min="0" max="100" required>
+          <label>Years building (automatic)</label>
+          <div class="input" id="yearsReadout" style="display:flex;align-items:center;color:#e2622a;font-weight:600;">—</div>
         </div>
         <button type="submit" class="btn" id="statsSaveBtn">Save</button>
       </form>
@@ -435,15 +435,31 @@ const statsForm = document.getElementById('statsForm');
 const statsSaveBtn = document.getElementById('statsSaveBtn');
 const statsSavedMsg = document.getElementById('statsSavedMsg');
 const projectsShippedInput = document.getElementById('projectsShipped');
-const yearsBuildingInput = document.getElementById('yearsBuilding');
-const customCodePercentInput = document.getElementById('customCodePercent');
+const buildingSinceInput = document.getElementById('buildingSince');
+const yearsReadout = document.getElementById('yearsReadout');
+
+// Whole years elapsed since the start date; ticks up automatically on the anniversary.
+function yearsSince(dateStr) {
+  const s = new Date(dateStr + 'T00:00:00');
+  if (isNaN(s)) return 0;
+  const now = new Date();
+  let y = now.getFullYear() - s.getFullYear();
+  const m = now.getMonth() - s.getMonth();
+  if (m < 0 || (m === 0 && now.getDate() < s.getDate())) y--;
+  return Math.max(0, y);
+}
+
+function updateYearsReadout() {
+  yearsReadout.textContent = buildingSinceInput.value ? yearsSince(buildingSinceInput.value) + ' years' : '—';
+}
+buildingSinceInput.addEventListener('input', updateYearsReadout);
 
 async function loadStats() {
   const { data, error } = await sb.from('site_stats').select('*').eq('id', 1).single();
   if (error || !data) return;
   projectsShippedInput.value = data.projects_shipped;
-  yearsBuildingInput.value = data.years_building;
-  customCodePercentInput.value = data.custom_code_percent;
+  buildingSinceInput.value = data.building_since;
+  updateYearsReadout();
 }
 loadStats();
 
@@ -453,12 +469,11 @@ statsForm.addEventListener('submit', async function (e) {
   statsSaveBtn.disabled = true;
   statsSaveBtn.textContent = 'Saving...';
 
-  const { error } = await sb.rpc('admin_update_stats', {
+  const { error } = await sb.rpc('admin_update_site_stats', {
     p_username: username,
     p_password: password,
     p_projects_shipped: parseInt(projectsShippedInput.value, 10),
-    p_years_building: parseInt(yearsBuildingInput.value, 10),
-    p_custom_code_percent: parseInt(customCodePercentInput.value, 10)
+    p_building_since: buildingSinceInput.value
   });
 
   statsSaveBtn.disabled = false;
