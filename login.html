@@ -5,13 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Panel — TJ Designs</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0; min-height: 100vh;
-    background: #0a0a0c; font-family: 'Inter', sans-serif;
+    background-color: #080b1a; background-image: radial-gradient(40% 40% at 15% 10%,rgba(139,107,255,.28),transparent 70%),radial-gradient(35% 35% at 90% 20%,rgba(47,216,255,.18),transparent 70%),radial-gradient(40% 40% at 60% 100%,rgba(139,107,255,.16),transparent 70%); background-attachment: fixed; font-family: 'Inter', sans-serif;
     display: flex; align-items: center; justify-content: center;
   }
   .grain {
@@ -20,32 +20,32 @@
   .login-card {
     position: relative; z-index: 1;
     width: 100%; max-width: 360px;
-    background: rgba(13, 13, 12, 0.6);
-    border: 1px solid #262520;
+    background: rgba(255,255,255,0.045);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 14px;
     padding: 2.4rem 2rem;
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);
   }
-  .mark { width: 28px; height: 28px; color: #e2622a; margin: 0 auto 1.4rem; display: block; }
+  .mark { width: 28px; height: 28px; color: #8b6bff; margin: 0 auto 1.4rem; display: block; }
   h1 {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Sora', sans-serif;
     font-size: 1.6rem; letter-spacing: 0.02em;
     color: #f2f1ec; text-align: center; margin: 0 0 1.6rem;
   }
   .field { margin-bottom: 1rem; }
   .field label {
     display: block; font-size: 0.72rem; letter-spacing: 0.04em;
-    text-transform: uppercase; color: #999790; margin-bottom: 0.4rem;
+    text-transform: uppercase; color: #9aa0c7; margin-bottom: 0.4rem;
   }
   .input {
-    width: 100%; background: rgba(10, 10, 12, 0.6);
+    width: 100%; background: rgba(8, 11, 26, 0.6);
     border: 1px solid #333; border-radius: 8px;
     padding: 0.65rem 0.8rem; font-family: 'Inter', sans-serif;
     font-size: 0.9rem; color: #f2f1ec; transition: border-color 0.25s ease;
   }
   .input::placeholder { color: #6b6a63; }
-  .input:focus { outline: none; border-color: #e2622a; }
+  .input:focus { outline: none; border-color: #8b6bff; }
   .cta-btn {
     width: 100%; margin-top: 0.6rem;
     position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
@@ -53,16 +53,25 @@
     color: #f2f1ec; font-family: 'Inter', sans-serif; font-weight: 600; font-size: 14px;
     cursor: pointer; transition: border-color .3s, box-shadow .3s;
   }
-  .cta-btn:hover { box-shadow: 0 0 28px rgba(226,98,42,.32); border-color: #4a2f22; }
+  .cta-btn:hover { box-shadow: 0 0 28px rgba(139,107,255,.32); border-color: #3b3478; }
   .cta-btn:disabled { opacity: 0.6; cursor: default; }
   .error-msg {
-    font-size: 0.8rem; color: #e2622a; margin-top: 0.9rem; text-align: center; display: none;
+    font-size: 0.8rem; color: #8b6bff; margin-top: 0.9rem; text-align: center; display: none;
   }
   .back-link {
     display: block; text-align: center; margin-top: 1.6rem;
     font-size: 0.78rem; color: #666; text-decoration: none;
   }
   .back-link:hover { color: #999; }
+
+  /* ---- shared theme (matches /home) ---- */
+  .cta-btn { background: linear-gradient(120deg,#8b6bff,#2fd8ff) !important; color: #06081a !important; border: 0 !important; font-family: 'Sora', sans-serif !important; }
+  .cta-btn:hover { box-shadow: 0 12px 34px -8px rgba(139,107,255,.7) !important; transform: translateY(-2px); }
+  .cta-btn::before { display: none !important; }
+  .cta-dot { background: #06081a !important; box-shadow: none !important; }
+  .cta-btn .sweep { display: none; }
+  h1 { font-weight: 800; letter-spacing: -0.02em !important; }
+  .login-card{border-radius:26px}
 </style>
 </head>
 <body>
@@ -86,7 +95,7 @@
     <button type="submit" class="cta-btn" id="loginBtn"><span id="loginBtnText">Sign in</span></button>
     <div class="error-msg" id="errorMsg">Wrong username or password.</div>
   </form>
-  <a href="/" class="back-link">&larr; Back to site</a>
+  <a href="/home" class="back-link">&larr; Back to site</a>
 </div>
 
 <script>

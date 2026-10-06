@@ -6,17 +6,17 @@
 <title>Built different — Tristan Johnson</title>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap');
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: #0a0a0c; color: #f2f1ec; font-family: 'Inter', sans-serif; overflow-x: hidden; min-height: 100vh; }
+  body { background-color: #080b1a; background-image: radial-gradient(40% 40% at 15% 10%,rgba(139,107,255,.28),transparent 70%),radial-gradient(35% 35% at 90% 20%,rgba(47,216,255,.18),transparent 70%),radial-gradient(40% 40% at 60% 100%,rgba(139,107,255,.16),transparent 70%); background-attachment: fixed; color: #f2f1ec; font-family: 'Inter', sans-serif; overflow-x: hidden; min-height: 100vh; }
   .grain { position: fixed; inset: 0; pointer-events: none; z-index: 999; opacity: 0.06; mix-blend-mode: overlay;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
   .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 998; background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%); }
-  .back { position: fixed; top: 1.6rem; left: 2rem; z-index: 900; font-size: 0.85rem; color: #999790; text-decoration: none; transition: color .25s; }
-  .back:hover { color: #e2622a; }
+  .back { position: fixed; top: 1.6rem; left: 2rem; z-index: 900; font-size: 0.85rem; color: #9aa0c7; text-decoration: none; transition: color .25s; }
+  .back:hover { color: #8b6bff; }
   .after { max-width: 1000px; margin: 0 auto; padding: 4rem 2rem 6rem; text-align: center; }
   .after a { display: inline-block; padding: 1rem 2.2rem; border: 1px solid #45433a; border-radius: 999px; color: #f2f1ec; text-decoration: none; font-size: 0.95rem; transition: border-color .3s, box-shadow .3s; }
-  .after a:hover { border-color: #e2622a; box-shadow: 0 8px 30px -8px rgba(226,98,42,.45); }
+  .after a:hover { border-color: #8b6bff; box-shadow: 0 8px 30px -8px rgba(139,107,255,.45); }
   /* ---------- SCROLL-SCRUBBED BUILD SECTION ---------- */
   .build {
     position: relative;
@@ -41,11 +41,11 @@
     font-size: 0.8rem;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #999790;
+    color: #9aa0c7;
   }
 
   .build-copy h2 {
-    font-family: 'Bebas Neue', sans-serif;
+    font-family: 'Sora', sans-serif;
     font-size: 2.2rem;
     line-height: 1.15;
     margin: 0.8rem 0 0;
@@ -54,7 +54,7 @@
 
   .build-copy p {
     font-size: 0.9rem;
-    color: #999790;
+    color: #9aa0c7;
     margin: 1rem 0 2rem;
     max-width: 260px;
     line-height: 1.5;
@@ -86,9 +86,9 @@
   }
 
   .build-stage.active { color: #f2f1ec; }
-  .build-stage.active .build-stage-dot { background: #e2622a; }
+  .build-stage.active .build-stage-dot { background: #8b6bff; }
   .build-stage.done { color: #777; }
-  .build-stage.done .build-stage-dot { background: #6b4229; }
+  .build-stage.done .build-stage-dot { background: #4a3cc0; }
 
   .build-progress-track {
     height: 2px;
@@ -100,7 +100,7 @@
 
   .build-progress-fill {
     height: 100%;
-    background: #e2622a;
+    background: #8b6bff;
     width: 0%;
   }
 
@@ -108,7 +108,7 @@
     position: relative;
     width: 100%;
     aspect-ratio: 16/10;
-    background: #14130f;
+    background: #0d1130;
     border: 1px dashed #333;
     border-radius: 2px;
     overflow: hidden;
@@ -145,7 +145,7 @@
   }
 
   .build-bar {
-    background: #2a2924;
+    background: #1f2447;
     border-radius: 3px;
     transition: opacity 0.15s linear;
   }
@@ -174,12 +174,12 @@
 
   .build-logo-bar { height: 18px; width: 64px; }
   .build-navitem-bar { height: 11px; width: 38px; }
-  .build-cta-bar { height: 11px; width: 18px; border-radius: 999px; background: #6b4229; }
+  .build-cta-bar { height: 11px; width: 18px; border-radius: 999px; background: #4a3cc0; }
 
   .build-headline-bar { height: 24px; width: 84%; max-width: 320px; }
   .build-sub-bar { height: 12px; width: 92%; max-width: 340px; }
   .build-cta2-bar { height: 24px; width: 110px; margin-top: 0.3rem; }
-  .build-cta2-bar.filled { border: 1px solid #e2622a; opacity: 0; background: transparent; }
+  .build-cta2-bar.filled { border: 1px solid #8b6bff; opacity: 0; background: transparent; }
 
   .build-image {
     position: relative;
@@ -187,13 +187,13 @@
     min-height: 0;
     border-radius: 4px;
     overflow: hidden;
-    background: #2a2924;
+    background: #1f2447;
   }
 
   .build-image-color {
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, #6b4229, #14130f 70%);
+    background: linear-gradient(135deg, #4a3cc0, #0d1130 70%);
     opacity: 0;
     transition: opacity 0.15s linear;
   }
@@ -206,7 +206,7 @@
   }
 
   .build-card {
-    background: #17161280;
+    background: #14183a80;
     border: 1px solid #222;
     border-radius: 3px;
     padding: 0.7rem;
@@ -219,7 +219,7 @@
     width: 12px;
     height: 12px;
     border-radius: 3px;
-    background: #e2622a;
+    background: #8b6bff;
     opacity: 0;
     transition: opacity 0.15s linear;
   }
@@ -230,9 +230,9 @@
     right: 1rem;
     padding: 2px 10px;
     border-radius: 999px;
-    border: 1px solid #e2622a;
+    border: 1px solid #8b6bff;
     font-size: 0.7rem;
-    color: #e2622a;
+    color: #8b6bff;
     opacity: 0;
     transition: opacity 0.15s linear;
   }
@@ -241,7 +241,7 @@
     position: absolute;
     width: 20px;
     height: 20px;
-    border-color: #e2622a;
+    border-color: #8b6bff;
     border-style: solid;
     border-width: 0;
     opacity: 0;
@@ -281,7 +281,7 @@
 <body>
 <div class="grain"></div>
 <div class="vignette"></div>
-<a class="back" href="home.html" data-key="build_back">← Back to home</a>
+<a class="back" href="/home" data-key="build_back">← Back to home</a>
 
 <main>
   <section class="build" id="build">
@@ -318,7 +318,7 @@
           <div class="build-nav-row">
             <div class="build-rel">
               <div class="build-bar build-logo-bar" id="navLogoBar"></div>
-              <div class="build-content" id="navLogoText" style="font-family:'Bebas Neue',sans-serif;font-size:1rem;color:#e2622a;">Prtfl.</div>
+              <div class="build-content" id="navLogoText" style="font-family:'Sora',sans-serif;font-size:1rem;color:#8b6bff;">Prtfl.</div>
             </div>
             <div class="build-nav-items">
               <div class="build-rel">
@@ -336,15 +336,15 @@
           <div style="display:flex;flex-direction:column;gap:0.6rem;">
             <div class="build-rel">
               <div class="build-bar build-headline-bar" id="headlineBar"></div>
-              <div class="build-content" id="headlineText" style="font-family:'Bebas Neue',sans-serif;font-size:1.3rem;color:#f2f1ec;">Design, done right.</div>
+              <div class="build-content" id="headlineText" style="font-family:'Sora',sans-serif;font-size:1.3rem;color:#f2f1ec;">Design, done right.</div>
             </div>
             <div class="build-rel">
               <div class="build-bar build-sub-bar" id="subBar"></div>
-              <div class="build-content" id="subText" style="font-size:0.75rem;color:#999790;">A six-stage look at how a screen moves from sketch to shipped.</div>
+              <div class="build-content" id="subText" style="font-size:0.75rem;color:#9aa0c7;">A six-stage look at how a screen moves from sketch to shipped.</div>
             </div>
             <div class="build-rel">
               <div class="build-bar build-cta2-bar" id="ctaBar"></div>
-              <div class="build-cta2-bar filled" id="ctaFilled" style="display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#e2622a;">View the work</div>
+              <div class="build-cta2-bar filled" id="ctaFilled" style="display:flex;align-items:center;justify-content:center;font-size:0.7rem;color:#8b6bff;">View the work</div>
             </div>
           </div>
 
@@ -423,7 +423,7 @@
     buildMockup.style.borderStyle = structure < 0.98 ? 'dashed' : 'solid';
     buildMockup.style.borderColor = '#333';
     buildMockup.style.boxShadow = polish > 0.01
-      ? `0 ${Math.round(24 * polish)}px ${Math.round(48 * polish)}px -16px rgba(0,0,0,${(0.5 * polish).toFixed(2)}), 0 0 0 1px rgba(226,98,42,${(0.12 * polish).toFixed(2)})`
+      ? `0 ${Math.round(24 * polish)}px ${Math.round(48 * polish)}px -16px rgba(0,0,0,${(0.5 * polish).toFixed(2)}), 0 0 0 1px rgba(139,107,255,${(0.12 * polish).toFixed(2)})`
       : 'none';
 
     brackets.forEach(b => b.style.opacity = 1 - structure);
