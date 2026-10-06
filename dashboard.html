@@ -3,8 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard — TJ Designs</title>
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTkgMjU5Ij48cGF0aCBkPSJNMTExLDY2IEwxMTEsODMgTDExNCw4NiBMMTE1LDg2IEwxMjMsNzggWiBNMjMwLDgwIEwxNDQsMTY2IEwxMzEsMTU1IEwxNTMsMTM0IEwxMjksMTU0IEwxMjQsMTUwIEwxMzAsMTM1IEwxMTMsMTE4IEwxMjMsMTE3IEw5MCwxMDEgTDEwMiwxMDAgTDg1LDgzIEw5Nyw3MSBMMTA1LDc4IEwxMDUsNjEgTDk3LDUzIEw2Nyw4MyBMODQsOTkgTDcyLDEwMCBMNzcsMTA2IEw4OCwxMDYgTDEwNCwxMTYgTDk2LDExOCBMMTEzLDEzOSBMMTA1LDEzNCBMMTEzLDE0OSBMMTI1LDE1NCBMMTEzLDE1NSBMMTEzLDE2NiBMMjcsODAgTDExMiwxNjggWiIgZmlsbD0iYmxhY2siIGZpbGwtcnVsZT0iZXZlbm9kZCIvPjwvc3ZnPg==">
+<title>Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -158,17 +157,14 @@
 
 <div class="wrap">
   <div class="top-bar">
-    <div class="brand">
-      <svg viewBox="0 0 259 259" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M111,66 L111,83 L114,86 L115,86 L123,78 Z M230,80 L144,166 L131,155 L153,134 L129,154 L124,150 L130,135 L113,118 L123,117 L90,101 L102,100 L85,83 L97,71 L105,78 L105,61 L97,53 L67,83 L84,99 L72,100 L77,106 L88,106 L104,116 L96,118 L113,139 L105,134 L113,149 L125,154 L113,155 L113,166 L27,80 L112,168 Z" fill="currentColor" fill-rule="evenodd"/>
-      </svg>TJ Designs — Panel
-    </div>
+    <div class="brand">Panel</div>
     <button class="signout" id="signoutBtn">Sign out</button>
   </div>
 
   <div class="tabs">
     <button class="tab-btn active" data-tab="messages">Messages</button>
     <button class="tab-btn" data-tab="stats">Statistics</button>
+    <button class="tab-btn" data-tab="content">Site content</button>
     <button class="tab-btn" data-tab="work">Portfolio / Work</button>
     <button class="tab-btn" data-tab="account">Account</button>
   </div>
@@ -216,6 +212,20 @@
       </form>
       <div class="saved-msg" id="statsSavedMsg">Saved — the homepage will show these on next load.</div>
     </div>
+  </div>
+
+  <!-- SITE CONTENT TAB -->
+  <div class="tab-panel" id="panel-content">
+    <h1>Site content</h1>
+    <p class="sub">Every piece of text on the new homepage and build page. Change it, hit Save, and the site updates on next load. Projects and the three counters are managed in their own tabs.</p>
+    <form id="contentForm">
+      <div id="contentRoot"><div class="loading-state">Loading...</div></div>
+      <div style="position:sticky;bottom:0;padding:1rem 0;background:linear-gradient(to top,#0a0a0c 70%,transparent)">
+        <button type="submit" class="btn" id="contentSaveBtn">Save all changes</button>
+        <span class="saved-msg" id="contentSavedMsg" style="display:none;margin-left:.8rem">Saved.</span>
+        <span class="error-msg-inline" id="contentErrMsg" style="display:none;margin-left:.8rem">Couldn't save. Try signing in again.</span>
+      </div>
+    </form>
   </div>
 
   <!-- WORK / PORTFOLIO TAB -->
@@ -482,6 +492,56 @@ statsForm.addEventListener('submit', async function (e) {
   if (!error) {
     statsSavedMsg.style.display = 'block';
   }
+});
+
+// ---------- SITE CONTENT ----------
+const contentRoot = document.getElementById('contentRoot');
+const contentForm = document.getElementById('contentForm');
+const contentSaveBtn = document.getElementById('contentSaveBtn');
+const contentSavedMsg = document.getElementById('contentSavedMsg');
+const contentErrMsg = document.getElementById('contentErrMsg');
+let contentOriginal = {};
+const GROUP_ORDER = ['Navigation', 'Hero', 'Stats and details', 'Projects', 'Process', 'Build page', 'Bottom of page'];
+
+async function loadContent() {
+  const { data, error } = await sb.from('site_content').select('*').order('sort', { ascending: true });
+  if (error || !data) { contentRoot.innerHTML = '<div class="empty-state">Could not load content.</div>'; return; }
+  contentOriginal = {};
+  const groups = {};
+  data.forEach(r => { contentOriginal[r.key] = r.value; (groups[r.grp] = groups[r.grp] || []).push(r); });
+  const names = GROUP_ORDER.filter(g => groups[g]).concat(Object.keys(groups).filter(g => !GROUP_ORDER.includes(g)));
+  contentRoot.innerHTML = names.map(g => `
+    <div class="card">
+      <div class="section-heading">${escapeHtml(g)}</div>
+      ${groups[g].map(r => `
+        <div class="field">
+          <label for="c_${escapeHtml(r.key)}">${escapeHtml(r.label || r.key)}</label>
+          ${r.value.length > 70
+            ? `<textarea id="c_${escapeHtml(r.key)}" data-ckey="${escapeHtml(r.key)}" style="font-family:'Inter',sans-serif;font-size:.9rem;min-height:70px">${escapeHtml(r.value)}</textarea>`
+            : `<input class="input" id="c_${escapeHtml(r.key)}" data-ckey="${escapeHtml(r.key)}" value="${escapeHtml(r.value)}">`}
+        </div>`).join('')}
+    </div>`).join('');
+}
+loadContent();
+
+contentForm.addEventListener('submit', async function (e) {
+  e.preventDefault();
+  contentSavedMsg.style.display = 'none';
+  contentErrMsg.style.display = 'none';
+  const changed = {};
+  contentRoot.querySelectorAll('[data-ckey]').forEach(el => {
+    if (el.value !== contentOriginal[el.dataset.ckey]) changed[el.dataset.ckey] = el.value;
+  });
+  if (!Object.keys(changed).length) { contentSavedMsg.textContent = 'Nothing to save.'; contentSavedMsg.style.display = 'inline'; return; }
+  contentSaveBtn.disabled = true;
+  contentSaveBtn.textContent = 'Saving...';
+  const { error } = await sb.rpc('admin_set_content', { p_username: username, p_password: password, p_items: changed });
+  contentSaveBtn.disabled = false;
+  contentSaveBtn.textContent = 'Save all changes';
+  if (error) { contentErrMsg.style.display = 'inline'; return; }
+  Object.assign(contentOriginal, changed);
+  contentSavedMsg.textContent = 'Saved — the site shows it on next load.';
+  contentSavedMsg.style.display = 'inline';
 });
 
 // ---------- PORTFOLIO / WORK ----------

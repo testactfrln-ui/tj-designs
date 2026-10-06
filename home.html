@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tristan Johnson — Web Developer</title>
+<meta name="description" content="Full custom design and development for brands who want their site to feel as considered as their product.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<style>
+  :root{--bg:#080b1a;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.1);--ink:#eef0ff;--mute:#9aa0c7;--v:#8b6bff;--c:#2fd8ff;--grad:linear-gradient(120deg,#8b6bff,#2fd8ff)}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:-20%;z-index:-1;background:radial-gradient(40% 40% at 15% 10%,rgba(139,107,255,.28),transparent 70%),radial-gradient(35% 35% at 90% 20%,rgba(47,216,255,.18),transparent 70%),radial-gradient(40% 40% at 60% 100%,rgba(139,107,255,.16),transparent 70%)}
+  a{color:inherit}
+  :focus-visible{outline:2px solid var(--c);outline-offset:3px;border-radius:6px}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+    nav{position:sticky;top:14px;z-index:40;margin:14px auto 0;max-width:1180px;padding:0 24px}
+  .nav-in{display:flex;align-items:center;justify-content:space-between;height:58px;padding:0 10px 0 24px;background:rgba(14,18,40,.7);backdrop-filter:blur(16px);border:1px solid var(--line);border-radius:999px}
+  .nav-name{font-family:'Sora',sans-serif;font-weight:700;color:var(--mute)}
+  .links{display:flex;gap:26px;align-items:center;font-size:14px}
+  .links a{text-decoration:none;color:var(--mute);transition:color .2s}
+  .links a:hover{color:var(--ink)}
+  .btn{display:inline-flex;align-items:center;gap:10px;font-family:'Sora',sans-serif;font-weight:600;font-size:15px;text-decoration:none;color:#06081a!important;background:var(--grad);padding:14px 24px;border-radius:999px;border:0;cursor:pointer;transition:transform .2s,box-shadow .3s}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 12px 34px -8px rgba(139,107,255,.7)}
+  .btn.ghost{background:transparent;color:var(--ink)!important;border:1px solid var(--line)}
+  .btn.ghost:hover{background:rgba(255,255,255,.07);box-shadow:none}
+  .btn.sm{padding:10px 18px;font-size:14px}
+  .bento{display:grid;grid-template-columns:repeat(12,1fr);gap:16px;padding:40px 0 20px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:clamp(22px,3vw,34px);backdrop-filter:blur(8px);position:relative;overflow:hidden}
+  .hero-t{grid-column:span 8;grid-row:span 2;display:flex;flex-direction:column;justify-content:center;min-height:430px}
+  .pill{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;font-size:13px;border:1px solid var(--line);padding:7px 14px;border-radius:999px;color:var(--mute);margin-bottom:22px}
+  .dot{width:8px;height:8px;border-radius:50%;background:#37e08b;animation:pulse 2s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(55,224,139,.6)}70%{box-shadow:0 0 0 9px rgba(55,224,139,0)}100%{box-shadow:0 0 0 0 rgba(55,224,139,0)}}
+  h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(34px,5.4vw,66px);line-height:1.03;letter-spacing:-.035em;margin-bottom:20px}
+  h1 span.g{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{color:var(--mute);font-size:clamp(16px,1.6vw,19px);max-width:44ch;margin-bottom:28px}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .stat{grid-column:span 4;display:flex;flex-direction:column;justify-content:space-between;min-height:206px}
+  .stat b{font-family:'Sora',sans-serif;font-size:clamp(40px,5vw,60px);font-weight:800;letter-spacing:-.03em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .stat span{color:var(--mute);font-size:13px;letter-spacing:.08em;text-transform:uppercase}
+  .stack-t{grid-column:span 8}
+  .reply{font-family:'Sora',sans-serif;font-size:26px;font-weight:700;margin-top:6px}
+  .talk-t{grid-column:span 12;display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chips span{border:1px solid var(--line);border-radius:999px;padding:6px 13px;font-size:13px;color:var(--mute)}
+  .label{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--c);font-weight:600}
+  section{padding:70px 0 10px}
+  h2{font-family:'Sora',sans-serif;font-weight:700;font-size:clamp(30px,4.6vw,52px);letter-spacing:-.03em;line-height:1.08;margin:10px 0 34px}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
+  .card{grid-column:span 6;border-radius:26px;border:1px solid var(--line);background:var(--card);overflow:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .35s;display:flex;flex-direction:column}
+  .card:first-child{grid-column:span 12}
+  .card:hover{transform:translateY(-6px);border-color:rgba(139,107,255,.55);box-shadow:0 26px 60px -28px rgba(139,107,255,.6)}
+  .media{aspect-ratio:16/10;position:relative;background:#0c1130;overflow:hidden}
+  .card:first-child .media{aspect-ratio:16/8}
+  .media iframe,.media img{position:absolute;inset:0;width:100%;height:100%;border:0;object-fit:cover}
+  .ph-media{position:absolute;inset:0;display:grid;place-items:center;background:linear-gradient(135deg,rgba(139,107,255,.18),rgba(47,216,255,.1))}
+  .ph-media span{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
+  .meta{padding:22px 26px 26px}
+  .meta h3{font-family:'Sora',sans-serif;font-size:22px;margin-bottom:6px}
+  .meta p{color:var(--mute);font-size:15px;margin-bottom:14px}
+  .meta a{font-size:14px;font-weight:500;text-decoration:none;color:var(--c)}
+  .meta a:hover{text-decoration:underline}
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .step b{font-family:'Sora',sans-serif;font-size:14px;color:var(--v)}
+  .step h3{font-family:'Sora',sans-serif;font-size:24px;margin:8px 0 8px}
+  .step p{color:var(--mute);font-size:15px}
+  .build-link{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-top:16px;padding:26px 30px;border-radius:26px;border:1px dashed rgba(139,107,255,.6);text-decoration:none;transition:background .25s}
+  .build-link:hover{background:rgba(139,107,255,.1)}
+  .build-link b{font-family:'Sora',sans-serif;font-size:22px}
+  .build-link small{display:block;color:var(--mute);font-size:13px;margin-top:2px}
+  .cta{margin:60px 0 70px;text-align:center;padding:clamp(40px,7vw,86px);background:linear-gradient(135deg,rgba(139,107,255,.3),rgba(47,216,255,.16));border-radius:34px;border:1px solid var(--line)}
+  .cta h2{margin:8px auto 14px;max-width:16ch}
+  .cta p{color:var(--mute);margin-bottom:28px}
+  footer{border-top:1px solid var(--line);padding:26px 0;font-size:13px;color:var(--mute)}
+  .reveal{opacity:0;transform:translateY(24px);transition:opacity .7s,transform .7s}
+  .reveal.in{opacity:1;transform:none}
+  .sticky-cta{display:none}
+  @media (max-width:900px){
+    .links a:not(.btn){display:none}
+    .hero-t,.stat,.stack-t,.talk-t,.card,.card:first-child{grid-column:span 12}
+    .hero-t{min-height:0}
+    .stat{min-height:130px}
+    .steps{grid-template-columns:1fr}
+    .talk-t{flex-direction:column;align-items:flex-start}
+    .sticky-cta{display:block;position:fixed;left:14px;right:14px;bottom:14px;z-index:45}
+    .sticky-cta .btn{width:100%;justify-content:center;box-shadow:0 14px 34px -10px rgba(0,0,0,.6)}
+    body{padding-bottom:84px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.reveal{opacity:1;transform:none}}
+
+  .panel-link{display:block;text-align:center;padding:6px 0 26px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:rgba(154,160,199,.4);text-decoration:none}
+  .panel-link:hover{color:var(--mute)}
+  .foot-in{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+  .foot-in a{color:var(--c);text-decoration:none}
+  .foot-in a:hover{text-decoration:underline}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <span class="nav-name" data-key="nav_name">Tristan Johnson</span>
+    <div class="links">
+      <a href="#work" data-key="nav_work">Work</a><a href="#process" data-key="nav_process">Process</a><a href="#contact" data-key="nav_contact">Contact</a>
+      <a class="btn sm" href="contact.html" data-key="nav_cta">Start a project</a>
+    </div>
+  </div>
+</nav>
+
+<main class="wrap">
+  <div class="bento">
+    <div class="tile hero-t">
+      <span class="pill"><span class="dot"></span><span data-key="hero_badge">Taking new projects</span></span>
+      <h1><span data-key="hero_headline_a">I build sites that make people</span> <span class="g" data-key="hero_headline_b">stop scrolling.</span></h1>
+      <p class="lede" data-key="hero_sub">Full custom design and development for brands who want their site to feel as considered as their product.</p>
+      <div class="cta-row">
+        <a class="btn" href="contact.html"><span data-key="hero_cta_primary">Start a project</span> →</a>
+        <a class="btn ghost" href="#work" data-key="hero_cta_secondary">See the work</a>
+      </div>
+    </div>
+    <div class="tile stat"><span data-key="stat_projects_label">Projects shipped</span><b id="statProjects" data-count="35">0</b></div>
+    <div class="tile stat"><span data-key="stat_years_label">Years building</span><b id="statYears" data-count="5">0</b></div>
+    <div class="tile stat"><span data-key="stat_code_label">% custom code</span><b id="statCode" data-count="100">0</b></div>
+    <div class="tile stack-t"><div class="label" data-key="stack_label">Stack</div><div class="chips" id="stackChips"><span>HTML</span><span>CSS</span><span>JavaScript</span><span>Supabase</span><span>Cloudflare</span></div></div>
+    <div class="tile talk-t"><div><div class="label" data-key="reply_label">Reply time</div><div class="reply" data-key="reply_value">Usually within a day or two</div></div><a class="btn ghost sm" href="contact.html" data-key="reply_cta">Say hello</a></div>
+  </div>
+
+  <section id="work">
+    <div class="label reveal" data-key="work_label">Selected work</div>
+    <h2 class="reveal" data-key="work_title">Projects</h2>
+    <div class="grid" id="projects"></div>
+  </section>
+
+  <section id="process">
+    <div class="label reveal" data-key="process_label">How it works</div>
+    <h2 class="reveal" data-key="process_title">Three steps, no surprises</h2>
+    <div class="steps">
+      <div class="tile step reveal"><b>01</b><h3 data-key="step1_title">Talk</h3><p data-key="step1_text">We go over what you need and what a good result looks like.</p></div>
+      <div class="tile step reveal"><b>02</b><h3 data-key="step2_title">Build</h3><p data-key="step2_text">I build it custom, and you see progress along the way.</p></div>
+      <div class="tile step reveal"><b>03</b><h3 data-key="step3_title">Launch</h3><p data-key="step3_text">Your site goes live and you own it.</p></div>
+    </div>
+    <a class="build-link reveal" href="build.html"><span><b data-key="build_link_title">Built different.</b><small data-key="build_link_text">Scroll to watch a real screen move from wireframe to shipped, stage by stage.</small></span><span style="font-size:26px">→</span></a>
+  </section>
+
+  <div class="cta reveal" id="contact">
+    <div class="label" data-key="cta_label">Let's work together</div>
+    <h2 data-key="cta_title">Have a screen worth building?</h2>
+    <p data-key="cta_text">Tell me about your project and I'll get back to you.</p>
+    <a class="btn" href="contact.html"><span data-key="cta_button">Start a project</span> →</a>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap foot-in">
+    <span data-key="footer_copy">© 2026 Tristan Johnson</span>
+    <a id="footerEmail" href="mailto:tljohnsonui@gmail.com"><span data-key="footer_email">tljohnsonui@gmail.com</span></a>
+  </div>
+  <a href="login.html" class="panel-link">panel</a>
+</footer>
+<div class="sticky-cta"><a class="btn" href="contact.html"><span data-key="cta_button">Start a project</span> →</a></div>
+
+<script>
+(function () {
+  var SB_URL = 'https://ijzdtnkdnzlkyfqdcoan.supabase.co';
+  var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM';
+  var sb = window.supabase ? window.supabase.createClient(SB_URL, SB_KEY) : null;
+
+  function esc(s) {
+    return (s || '').replace(/[&<>"']/g, function (m) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m];
+    });
+  }
+
+  /* ---------- text from the database (site_content) ---------- */
+  function applyContent(c) {
+    document.querySelectorAll('[data-key]').forEach(function (el) {
+      var v = c[el.getAttribute('data-key')];
+      if (v !== undefined && v !== null) el.textContent = v;
+    });
+    if (c.stack_items !== undefined) {
+      var box = document.getElementById('stackChips');
+      if (box) {
+        box.innerHTML = '';
+        c.stack_items.split(',').forEach(function (t) {
+          t = t.trim(); if (!t) return;
+          var s = document.createElement('span'); s.textContent = t; box.appendChild(s);
+        });
+      }
+    }
+    if (c.footer_email) {
+      var m = document.getElementById('footerEmail');
+      if (m) m.setAttribute('href', 'mailto:' + c.footer_email);
+    }
+    if (c.stat_code_value !== undefined) {
+      var cv = document.getElementById('statCode');
+      if (cv) cv.setAttribute('data-count', parseInt(c.stat_code_value, 10) || 0);
+    }
+  }
+
+  /* ---------- count-up numbers ---------- */
+  function countUp(el) {
+    var target = parseInt(el.getAttribute('data-count'), 10) || 0, cur = 0, inc = Math.max(target / 75, 0.05);
+    (function tick() {
+      cur += inc;
+      if (cur < target) { el.textContent = Math.floor(cur); requestAnimationFrame(tick); }
+      else el.textContent = target;
+    })();
+  }
+  var counted = false;
+  function startCounters() {
+    if (counted) return; counted = true;
+    var io2 = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { countUp(e.target); io2.unobserve(e.target); } });
+    }, { threshold: .4 });
+    document.querySelectorAll('[data-count]').forEach(function (el) { io2.observe(el); });
+  }
+
+  function yearsSince(d) {
+    var s = new Date(d + 'T00:00:00'), n = new Date();
+    var y = n.getFullYear() - s.getFullYear(), m = n.getMonth() - s.getMonth();
+    if (m < 0 || (m === 0 && n.getDate() < s.getDate())) y--;
+    return Math.max(0, y);
+  }
+
+  /* ---------- project embeds ---------- */
+  function codepenUrl(code) {
+    var url = null;
+    var f = code.match(/<iframe[^>]*\ssrc=["']([^"']+)["']/i);
+    var sl = code.match(/data-slug-hash=["']([^"']+)["']/i);
+    if (f) url = f[1];
+    else if (sl) {
+      var u = (code.match(/data-user=["']([^"']+)["']/i) || [])[1] || 'anon';
+      var tab = (code.match(/data-default-tab=["']([^"']+)["']/i) || [])[1] || 'result';
+      url = 'https://codepen.io/' + u + '/embed/' + sl[1] + '?default-tab=' + tab;
+    } else if (code.indexOf('<') === -1) url = code.replace(/\/(pen|full|details)\//, '/embed/');
+    if (!url) return null;
+    if (url.indexOf('//') === 0) url = 'https:' + url;
+    try {
+      var p = new URL(url);
+      if (p.protocol !== 'https:' || !(p.hostname === 'codepen.io' || /\.codepen\.io$/.test(p.hostname))) return null;
+      return p.toString().replace(/&amp;/g, '&');
+    } catch (e) { return null; }
+  }
+  function fit(html) {
+    return '<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0;height:100%}iframe,video,embed,object{width:100%!important;height:100%!important;border:0;display:block}</style></head><body>' + html + '</body></html>';
+  }
+  function build(html, css, js) {
+    html = html || ''; css = css || ''; js = js || '';
+    var st = css.trim() ? '<style>\n' + css + '\n</style>' : '';
+    var sc = js.trim() ? '<script>\n' + js.replace(/<\/script/gi, '<\\/script') + '\n<\/script>' : '';
+    if (/<html[\s>]|<!doctype/i.test(html)) {
+      var o = html;
+      if (st) o = /<\/head>/i.test(o) ? o.replace(/<\/head>/i, st + '</head>') : st + o;
+      if (sc) o = /<\/body>/i.test(o) ? o.replace(/<\/body>/i, sc + '</body>') : o + sc;
+      return o;
+    }
+    return '<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>html,body{margin:0}</style>' + st + '</head><body>' + html + sc + '</body></html>';
+  }
+  function media(it) {
+    if (it.embed_type === 'image' && it.image_url)
+      return '<img src="' + esc(it.image_url) + '" alt="' + esc(it.title) + '" loading="lazy">';
+    if ((it.embed_type === 'codepen' || it.embed_type === 'html') && it.embed_code) {
+      var t = it.embed_code.trim(), cp = codepenUrl(t);
+      if (cp) return '<iframe src="' + esc(cp) + '" loading="lazy" allowfullscreen sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>';
+      return '<iframe srcdoc="' + esc(fit(t)) + '" loading="lazy" sandbox="allow-scripts"></iframe>';
+    }
+    if (it.embed_type === 'code' && (it.html_code || it.css_code || it.js_code))
+      return '<iframe srcdoc="' + esc(build(it.html_code, it.css_code, it.js_code)) + '" loading="lazy" sandbox="allow-scripts allow-forms allow-modals allow-popups"></iframe>';
+    return '<div class="ph-media"></div>';
+  }
+  function card(it, i) {
+    var link = it.link_url ? '<a href="' + esc(it.link_url) + '" target="_blank" rel="noopener">View project →</a>' : '';
+    return '<article class="card reveal in"><div class="media">' + media(it) + '</div><div class="meta"><h3>' + esc(it.title) + '</h3>' +
+      (it.description ? '<p>' + esc(it.description) + '</p>' : '') + link + '</div></article>';
+  }
+
+  function observeReveals() {
+    var io = new IntersectionObserver(function (es) {
+      es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+    }, { threshold: .12 });
+    document.querySelectorAll('.reveal:not(.in)').forEach(function (el) { io.observe(el); });
+  }
+
+  /* ---------- go ---------- */
+  var grid = document.getElementById('projects');
+  observeReveals();
+
+  if (!sb) {                       // database library didn't load: keep built-in text, show labelled samples
+    grid.innerHTML = [1, 2, 3].map(function () {
+      return '<article class="card in"><div class="media"><div class="ph-media"><span>sample</span></div></div><div class="meta"><h3>Project name</h3><p>Shown while the database is unreachable.</p></div></article>';
+    }).join('');
+    startCounters();
+    return;
+  }
+
+  sb.from('site_content').select('key,value').then(function (r) {
+    if (r && r.data && r.data.length) {
+      var c = {}; r.data.forEach(function (x) { c[x.key] = x.value; });
+      applyContent(c);
+    }
+  }, function () {});
+
+  sb.from('site_stats').select('*').eq('id', 1).single().then(function (r) {
+    var d = r && r.data;
+    if (d) {
+      document.getElementById('statProjects').setAttribute('data-count', d.projects_shipped);
+      var y = d.building_since ? yearsSince(d.building_since) : d.years_building;
+      document.getElementById('statYears').setAttribute('data-count', y);
+    }
+    startCounters();
+  }, function () { startCounters(); });
+
+  sb.from('portfolio_items').select('*').eq('is_hidden', false).order('sort_order', { ascending: true }).then(function (r) {
+    var items = (r && r.data) || [];
+    if (!items.length) {
+      grid.innerHTML = '<div class="tile empty" style="grid-column:span 12;text-align:center;color:var(--mute)">New projects landing soon.</div>';
+      return;
+    }
+    grid.innerHTML = items.map(card).join('');
+  }, function () {});
+})();
+
+</script>
+</body>
+</html>
