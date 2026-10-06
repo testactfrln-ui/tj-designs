@@ -615,6 +615,7 @@ async function loadWork() {
         <div class="work-actions">
           <button class="edit-btn" data-id="${item.id}">Edit</button>
           <button class="toggle-btn" data-id="${item.id}" data-hidden="${item.is_hidden}">${item.is_hidden ? 'Unhide' : 'Hide'}</button>
+          <button class="delete-btn" data-id="${item.id}" style="border-color:#4a2f22;">Delete</button>
         </div>
       </div>
       ${renderWorkPreview(item)}
@@ -641,6 +642,32 @@ async function loadWork() {
       workSaveBtn.textContent = 'Save changes';
       workCancelBtn.style.display = 'inline-block';
       window.scrollTo({ top: workForm.offsetTop - 100, behavior: 'smooth' });
+    });
+  });
+
+  // Two-step delete: first click arms the button, second click (within 4s) deletes for good.
+  workListRoot.querySelectorAll('.delete-btn').forEach(btn => {
+    let armed = false, timer = null;
+    btn.addEventListener('click', async () => {
+      if (!armed) {
+        armed = true;
+        btn.textContent = 'Click again to delete';
+        btn.style.color = '#e2622a';
+        timer = setTimeout(() => { armed = false; btn.textContent = 'Delete'; btn.style.color = ''; }, 4000);
+        return;
+      }
+      clearTimeout(timer);
+      btn.disabled = true;
+      btn.textContent = 'Deleting...';
+      const { error } = await sb.rpc('admin_remove_work', {
+        p_username: username, p_password: password, p_id: btn.getAttribute('data-id')
+      });
+      if (error) {
+        btn.disabled = false;
+        btn.textContent = 'Delete failed';
+        return;
+      }
+      loadWork();
     });
   });
 
