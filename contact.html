@@ -9,6 +9,33 @@
 <script src="https://unpkg.com/d3@7.9.0/dist/d3.min.js" integrity="sha384-CjloA8y00+1SDAUkjs099PVfnY2KmDC2BZnws9kh8D/lX1s46w6EPhpXdqMfjK6i" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/topojson-client@3.1.0/dist/topojson-client.min.js" integrity="sha384-Ukv1p/xTma6P4/2bY5KzWBw+ydSpXmhCMtyciIQVDJ1RmOxtCYNMF1uXT9T63H67" crossorigin="anonymous"></script>
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+/* error log: reports script errors and failed database calls to the panel's Error log tab */
+(function () {
+  var SB = 'https://ijzdtnkdnzlkyfqdcoan.supabase.co', K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM';
+  var sent = 0, seen = {}, client = null;
+  function log(kind, msg, detail) {
+    try {
+      msg = String(msg || '').slice(0, 480);
+      if (!msg || msg === 'Script error.' || sent >= 5 || seen[msg] || !window.supabase) return;
+      seen[msg] = 1; sent++;
+      client = client || window.supabase.createClient(SB, K);
+      client.from('site_errors').insert({
+        page: location.pathname.slice(0, 190), kind: kind, message: msg,
+        detail: detail ? String(detail).slice(0, 1900) : null, ua: navigator.userAgent.slice(0, 290)
+      }).then(function () {}, function () {});
+    } catch (e) {}
+  }
+  window.__logErr = log;
+  window.addEventListener('error', function (e) {
+    if (!e.message || /ResizeObserver/.test(e.message)) return;
+    log('error', e.message, (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '') + '\n' + ((e.error && e.error.stack) || ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason; log('promise', (r && r.message) || r || 'Unhandled promise rejection', r && r.stack);
+  });
+})();
+</script>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background: #080b1a; font-family: 'Inter', sans-serif; }
@@ -437,6 +464,7 @@ contactForm.addEventListener('submit', async function (e) {
       window.location.href = '/home';
     }, 900);
   } catch (err) {
+    if (window.__logErr) window.__logErr('contact_form', 'Contact form submit failed: ' + (err && err.message), '');
     formStatus.textContent = "Couldn't send that — try again or email me directly.";
     formStatus.style.display = 'block';
     sendBtn.disabled = false;

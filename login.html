@@ -7,6 +7,33 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+/* error log: reports script errors and failed database calls to the panel's Error log tab */
+(function () {
+  var SB = 'https://ijzdtnkdnzlkyfqdcoan.supabase.co', K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM';
+  var sent = 0, seen = {}, client = null;
+  function log(kind, msg, detail) {
+    try {
+      msg = String(msg || '').slice(0, 480);
+      if (!msg || msg === 'Script error.' || sent >= 5 || seen[msg] || !window.supabase) return;
+      seen[msg] = 1; sent++;
+      client = client || window.supabase.createClient(SB, K);
+      client.from('site_errors').insert({
+        page: location.pathname.slice(0, 190), kind: kind, message: msg,
+        detail: detail ? String(detail).slice(0, 1900) : null, ua: navigator.userAgent.slice(0, 290)
+      }).then(function () {}, function () {});
+    } catch (e) {}
+  }
+  window.__logErr = log;
+  window.addEventListener('error', function (e) {
+    if (!e.message || /ResizeObserver/.test(e.message)) return;
+    log('error', e.message, (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '') + '\n' + ((e.error && e.error.stack) || ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason; log('promise', (r && r.message) || r || 'Unhandled promise rejection', r && r.stack);
+  });
+})();
+</script>
 <style>
   * { box-sizing: border-box; }
   html, body {

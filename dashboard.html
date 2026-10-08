@@ -7,6 +7,33 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+/* error log: reports script errors and failed database calls to the panel's Error log tab */
+(function () {
+  var SB = 'https://ijzdtnkdnzlkyfqdcoan.supabase.co', K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM';
+  var sent = 0, seen = {}, client = null;
+  function log(kind, msg, detail) {
+    try {
+      msg = String(msg || '').slice(0, 480);
+      if (!msg || msg === 'Script error.' || sent >= 5 || seen[msg] || !window.supabase) return;
+      seen[msg] = 1; sent++;
+      client = client || window.supabase.createClient(SB, K);
+      client.from('site_errors').insert({
+        page: location.pathname.slice(0, 190), kind: kind, message: msg,
+        detail: detail ? String(detail).slice(0, 1900) : null, ua: navigator.userAgent.slice(0, 290)
+      }).then(function () {}, function () {});
+    } catch (e) {}
+  }
+  window.__logErr = log;
+  window.addEventListener('error', function (e) {
+    if (!e.message || /ResizeObserver/.test(e.message)) return;
+    log('error', e.message, (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '') + '\n' + ((e.error && e.error.stack) || ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason; log('promise', (r && r.message) || r || 'Unhandled promise rejection', r && r.stack);
+  });
+})();
+</script>
 <style>
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; background-color: #080b1a; background-image: radial-gradient(40% 40% at 15% 10%,rgba(139,107,255,.28),transparent 70%),radial-gradient(35% 35% at 90% 20%,rgba(47,216,255,.18),transparent 70%),radial-gradient(40% 40% at 60% 100%,rgba(139,107,255,.16),transparent 70%); background-attachment: fixed; font-family: 'Inter', sans-serif; color: #f2f1ec; min-height: 100vh; }
@@ -170,6 +197,7 @@
     <button class="tab-btn" data-tab="stats">Statistics</button>
     <button class="tab-btn" data-tab="content">Site content</button>
     <button class="tab-btn" data-tab="work">Portfolio / Work</button>
+    <button class="tab-btn" data-tab="errors">Error log <span id="errBadge" style="display:none;margin-left:.3rem;background:#ff5d73;color:#fff;border-radius:99px;padding:.05rem .45rem;font-size:.68rem"></span></button>
     <button class="tab-btn" data-tab="account">Account</button>
   </div>
 
@@ -308,6 +336,20 @@
     <div id="workListRoot" class="work-list">
       <div class="loading-state">Loading...</div>
     </div>
+  </div>
+
+  <!-- ERROR LOG TAB -->
+  <div class="tab-panel" id="panel-errors">
+    <h1>Error log</h1>
+    <p class="sub">Script errors and failed database calls reported by your public pages (home, build, contact, login), plus notes about known issues. Resolve items once handled.</p>
+    <div class="card" style="display:flex;gap:.8rem;flex-wrap:wrap;align-items:center;padding:1rem 1.2rem">
+      <label style="font-size:.82rem;color:#9aa0c7;display:flex;gap:.45rem;align-items:center;cursor:pointer"><input type="checkbox" id="errShowResolved"> Show resolved</label>
+      <label style="font-size:.82rem;color:#9aa0c7;display:flex;gap:.45rem;align-items:center;cursor:pointer"><input type="checkbox" id="errOnlyErrors"> Hide notes (live errors only)</label>
+      <span style="flex:1"></span>
+      <button class="btn btn-ghost" id="errRefresh" type="button">Refresh</button>
+      <button class="btn btn-ghost" id="errResolveAll" type="button">Resolve all shown</button>
+    </div>
+    <div id="errRoot" class="msg-list"><div class="loading-state">Loading...</div></div>
   </div>
 
   <!-- ACCOUNT TAB -->
@@ -547,6 +589,58 @@ contentForm.addEventListener('submit', async function (e) {
   contentSavedMsg.textContent = 'Saved — the site shows it on next load.';
   contentSavedMsg.style.display = 'inline';
 });
+
+// ---------- ERROR LOG ----------
+const errRoot = document.getElementById('errRoot');
+const errBadge = document.getElementById('errBadge');
+const errShowResolved = document.getElementById('errShowResolved');
+const errOnlyErrors = document.getElementById('errOnlyErrors');
+let errRows = [];
+
+async function loadErrors() {
+  const { data, error } = await sb.rpc('admin_get_errors', { p_username: username, p_password: password, p_include_resolved: errShowResolved.checked });
+  if (error) { errRoot.innerHTML = '<div class="empty-state">Could not load the log. Try signing in again.</div>'; return; }
+  errRows = data || [];
+  renderErrors();
+  // badge counts open live errors only (not notes)
+  const open = errRows.filter(r => r.status === 'open' && r.kind !== 'note').length;
+  errBadge.textContent = open; errBadge.style.display = open ? 'inline-block' : 'none';
+}
+
+function visibleErrors() {
+  return errRows.filter(r => !(errOnlyErrors.checked && r.kind === 'note'));
+}
+
+function renderErrors() {
+  const rows = visibleErrors();
+  if (!rows.length) { errRoot.innerHTML = '<div class="empty-state">Nothing here. No errors reported.</div>'; return; }
+  errRoot.innerHTML = rows.map(r => `
+    <div class="msg-card ${r.status === 'open' && r.kind !== 'note' ? 'unread' : ''}" style="${r.status === 'resolved' ? 'opacity:.55' : ''}">
+      <div class="msg-top">
+        <span class="msg-name">${escapeHtml(r.message)}</span>
+        <span class="msg-meta">${formatDate(r.created_at)}</span>
+      </div>
+      <div class="msg-type">${escapeHtml(r.kind)} · ${escapeHtml(r.page || '')} · ${escapeHtml(r.status)}</div>
+      ${r.detail ? `<div class="msg-details" style="font-size:.78rem;color:#9aa0c7;max-height:7.5rem;overflow:auto">${escapeHtml(r.detail)}</div>` : ''}
+      ${r.ua && r.kind !== 'note' ? `<div class="msg-meta" style="margin-top:.4rem;white-space:normal">${escapeHtml(r.ua)}</div>` : ''}
+      <button class="mark-read-btn" data-err-id="${r.id}" data-to="${r.status === 'open' ? 'resolved' : 'open'}">${r.status === 'open' ? 'Mark resolved' : 'Reopen'}</button>
+    </div>`).join('');
+  errRoot.querySelectorAll('[data-err-id]').forEach(b => b.addEventListener('click', async () => {
+    await sb.rpc('admin_set_error_status', { p_username: username, p_password: password, p_ids: [parseInt(b.dataset.errId, 10)], p_status: b.dataset.to });
+    loadErrors();
+  }));
+}
+
+errShowResolved.addEventListener('change', loadErrors);
+errOnlyErrors.addEventListener('change', renderErrors);
+document.getElementById('errRefresh').addEventListener('click', loadErrors);
+document.getElementById('errResolveAll').addEventListener('click', async () => {
+  const ids = visibleErrors().filter(r => r.status === 'open').map(r => r.id);
+  if (!ids.length) return;
+  await sb.rpc('admin_set_error_status', { p_username: username, p_password: password, p_ids: ids, p_status: 'resolved' });
+  loadErrors();
+});
+loadErrors();
 
 // ---------- PORTFOLIO / WORK ----------
 const workForm = document.getElementById('workForm');

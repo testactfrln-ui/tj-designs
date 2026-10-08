@@ -8,6 +8,33 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+/* error log: reports script errors and failed database calls to the panel's Error log tab */
+(function () {
+  var SB = 'https://ijzdtnkdnzlkyfqdcoan.supabase.co', K = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlqemR0bmtkbnpsa3lmcWRjb2FuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTEwNDQ5MTUsImV4cCI6MjEwNjYyMDkxNX0.UjNVYavdZZhNs4dCXzLiRzF57SXXU4FRs5wBe_D63sM';
+  var sent = 0, seen = {}, client = null;
+  function log(kind, msg, detail) {
+    try {
+      msg = String(msg || '').slice(0, 480);
+      if (!msg || msg === 'Script error.' || sent >= 5 || seen[msg] || !window.supabase) return;
+      seen[msg] = 1; sent++;
+      client = client || window.supabase.createClient(SB, K);
+      client.from('site_errors').insert({
+        page: location.pathname.slice(0, 190), kind: kind, message: msg,
+        detail: detail ? String(detail).slice(0, 1900) : null, ua: navigator.userAgent.slice(0, 290)
+      }).then(function () {}, function () {});
+    } catch (e) {}
+  }
+  window.__logErr = log;
+  window.addEventListener('error', function (e) {
+    if (!e.message || /ResizeObserver/.test(e.message)) return;
+    log('error', e.message, (e.filename || '') + ':' + (e.lineno || '') + ':' + (e.colno || '') + '\n' + ((e.error && e.error.stack) || ''));
+  });
+  window.addEventListener('unhandledrejection', function (e) {
+    var r = e.reason; log('promise', (r && r.message) || r || 'Unhandled promise rejection', r && r.stack);
+  });
+})();
+</script>
 <style>
   :root{--bg:#080b1a;--card:rgba(255,255,255,.045);--line:rgba(255,255,255,.1);--ink:#eef0ff;--mute:#9aa0c7;--v:#8b6bff;--c:#2fd8ff;--grad:linear-gradient(120deg,#8b6bff,#2fd8ff)}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -96,6 +123,9 @@
   .foot-in{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
   .foot-in a{color:var(--c);text-decoration:none}
   .foot-in a:hover{text-decoration:underline}
+  .work-note{display:flex;gap:10px;align-items:flex-start;max-width:70ch;margin:-14px 0 28px;padding:12px 16px;border:1px solid rgba(255,211,107,.35);background:rgba(255,211,107,.07);color:#e9dfc2;border-radius:16px;font-size:14px}
+  .work-note::before{content:"i";flex:none;width:20px;height:20px;border-radius:50%;background:#ffd36b;color:#1a1500;font:700 12px/20px 'Sora',sans-serif;text-align:center;margin-top:1px}
+  .sample-tag{position:absolute;left:14px;bottom:14px;z-index:2;pointer-events:none;background:rgba(8,11,26,.88);border:1px solid rgba(255,211,107,.5);color:#ffd36b;font-size:11px;letter-spacing:.06em;text-transform:uppercase;padding:5px 11px;border-radius:99px;backdrop-filter:blur(6px)}
 </style>
 </head>
 <body>
@@ -131,6 +161,7 @@
   <section id="work">
     <div class="label reveal" data-key="work_label">Selected work</div>
     <h2 class="reveal" data-key="work_title">Projects</h2>
+    <p class="work-note reveal" data-key="work_note">Heads up: the business projects below are concept mockups for fictional companies. They are samples that show my range, not real clients.</p>
     <div class="grid" id="projects"></div>
   </section>
 
@@ -176,6 +207,7 @@
 
   /* ---------- text from the database (site_content) ---------- */
   function applyContent(c) {
+    window.__c = c;
     document.querySelectorAll('[data-key]').forEach(function (el) {
       var v = c[el.getAttribute('data-key')];
       if (v !== undefined && v !== null) el.textContent = v;
@@ -273,7 +305,9 @@
   }
   function card(it, i) {
     var link = it.link_url ? '<a href="' + esc(it.link_url) + '" target="_blank" rel="noopener">View project →</a>' : '';
-    return '<article class="card reveal in"><div class="media">' + media(it) + '</div><div class="meta"><h3>' + esc(it.title) + '</h3>' +
+    var isSample = /^\s*(concept|sample)\b/i.test(it.description || '') || /fictional/i.test((it.description || '') + ' ' + (it.title || ''));
+    var tag = isSample ? '<span class="sample-tag" data-key="sample_tag">Sample · not a real business</span>' : '';
+    return '<article class="card reveal in"><div class="media">' + media(it) + tag + '</div><div class="meta"><h3>' + esc(it.title) + '</h3>' +
       (it.description ? '<p>' + esc(it.description) + '</p>' : '') + link + '</div></article>';
   }
 
@@ -297,6 +331,7 @@
   }
 
   sb.from('site_content').select('key,value').then(function (r) {
+    if (r && r.error && window.__logErr) window.__logErr('db', 'site_content: ' + r.error.message);
     if (r && r.data && r.data.length) {
       var c = {}; r.data.forEach(function (x) { c[x.key] = x.value; });
       applyContent(c);
@@ -304,6 +339,7 @@
   }, function () {});
 
   sb.from('site_stats').select('*').eq('id', 1).single().then(function (r) {
+    if (r && r.error && window.__logErr) window.__logErr('db', 'site_stats: ' + r.error.message);
     var d = r && r.data;
     if (d) {
       document.getElementById('statProjects').setAttribute('data-count', d.projects_shipped);
@@ -314,12 +350,14 @@
   }, function () { startCounters(); });
 
   sb.from('portfolio_items').select('*').eq('is_hidden', false).order('sort_order', { ascending: true }).then(function (r) {
+    if (r && r.error && window.__logErr) window.__logErr('db', 'portfolio_items: ' + r.error.message);
     var items = (r && r.data) || [];
     if (!items.length) {
       grid.innerHTML = '<div class="tile empty" style="grid-column:span 12;text-align:center;color:var(--mute)">New projects landing soon.</div>';
       return;
     }
     grid.innerHTML = items.map(card).join('');
+    if (window.__c) applyContent(window.__c);
   }, function () {});
 })();
 
