@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Tristan Johnson — Web Developer</title>
-<meta name="description" content="Full custom design and development for brands who want their site to feel as considered as their product.">
+<meta name="description" content="Custom design and development for brands that want a website as strong as what they offer.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=Inter:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -79,6 +79,7 @@
   .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}
   .card{grid-column:span 6;border-radius:26px;border:1px solid var(--line);background:var(--card);overflow:hidden;transition:transform .35s cubic-bezier(.2,.8,.2,1),border-color .3s,box-shadow .35s;display:flex;flex-direction:column}
   .card:first-child{grid-column:span 12}
+  .card:last-child:nth-child(even){grid-column:span 12}
   .card:hover{transform:translateY(-6px);border-color:rgba(139,107,255,.55);box-shadow:0 26px 60px -28px rgba(139,107,255,.6)}
   .media{aspect-ratio:16/10;position:relative;background:#0c1130;overflow:hidden}
   .card:first-child .media{aspect-ratio:16/8}
@@ -145,7 +146,7 @@
     <div class="tile hero-t">
       <span class="pill"><span class="dot"></span><span data-key="hero_badge">Taking new projects</span></span>
       <h1><span data-key="hero_headline_a">I build sites that make people</span> <span class="g" data-key="hero_headline_b">stop scrolling.</span></h1>
-      <p class="lede" data-key="hero_sub">Full custom design and development for brands who want their site to feel as considered as their product.</p>
+      <p class="lede" data-key="hero_sub">Custom design and development for brands that want a website as strong as what they offer.</p>
       <div class="cta-row">
         <a class="btn" href="contact.html"><span data-key="hero_cta_primary">Start a project</span> →</a>
         <a class="btn ghost" href="#work" data-key="hero_cta_secondary">See the work</a>
